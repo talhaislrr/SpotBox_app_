@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../constants/colors';
+import { colors, colorCombinations } from '../constants/colors';
 
 export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.backBlack,
   },
   content: {
     flex: 1,
@@ -15,14 +15,17 @@ export const globalStyles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 10,
+    textShadowColor: colors.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: colors.textLight,
+    color: colors.textSecondary,
   },
-  // Tab navigation stilleri
+  // Tab navigation stilleri - Dark Theme
   tabIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -31,15 +34,19 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 28,
     marginBottom: 4,
     marginHorizontal: 8,
+    backgroundColor: colors.surfaceGrey,
+    borderWidth: 1,
+    borderColor: colors.outlineGrey,
   },
   focusedTabContainer: {
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colorCombinations.interactions.hover,
     transform: [{ scale: 1.1 }],
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    borderColor: colors.primary,
   },
   tabTransition: {
     transition: 'all 0.3s ease-in-out',
@@ -55,25 +62,27 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 36,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: colors.surfaceGrey,
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
     elevation: 12,
-    borderWidth: 3,
-    borderColor: colors.white,
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   expandedButton: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
     elevation: 16,
+    borderWidth: 3,
   },
   tabLogo: {
     width: 40,
     height: 40,
-    tintColor: colors.white,
+    tintColor: colors.textPrimary,
   },
 }); 

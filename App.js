@@ -1,17 +1,18 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { StackNavigator } from './src/navigation/StackNavigator';
 
 // SpotBox - Konum Tabanlı Müzik Uygulaması
-const App = () => {
+export default function App() {
   return (
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      <StackNavigator />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <StackNavigator />
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
-};
-
-export default App; 
+} 

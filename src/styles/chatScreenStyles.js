@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../constants/colors';
+import { colors, colorCombinations } from '../constants/colors';
 
 export const chatScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.backBlack,
   },
   content: {
     flex: 1,
@@ -12,12 +12,14 @@ export const chatScreenStyles = StyleSheet.create({
     paddingTop: 16,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 24,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   
@@ -26,20 +28,22 @@ export const chatScreenStyles = StyleSheet.create({
     flex: 1,
   },
   
-  // Chat Card (Ana sohbet kartı)
+  // Chat Card (Ana sohbet kartı) - Dark Theme
   chatCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surfaceGrey,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.outlineGrey,
     padding: 16,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 2,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   chatInfo: {
     flexDirection: 'row',
@@ -56,9 +60,10 @@ export const chatScreenStyles = StyleSheet.create({
     height: 48,
     textAlign: 'center',
     textAlignVertical: 'center',
-    backgroundColor: colors.accent,
+    backgroundColor: colors.primary,
     borderRadius: 24,
     overflow: 'hidden',
+    color: colors.textPrimary,
   },
   onlineIndicator: {
     position: 'absolute',
@@ -67,9 +72,13 @@ export const chatScreenStyles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.accent,
     borderWidth: 2,
-    borderColor: colors.white,
+    borderColor: colors.surfaceGrey,
+    shadowColor: colors.accent,
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 2,
   },
   chatDetails: {
     flex: 1,
@@ -77,12 +86,12 @@ export const chatScreenStyles = StyleSheet.create({
   chatName: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.textDark,
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   lastMessage: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.textSecondary,
     fontWeight: '400',
     lineHeight: 18,
   },
@@ -93,7 +102,7 @@ export const chatScreenStyles = StyleSheet.create({
   },
   chatTime: {
     fontSize: 12,
-    color: colors.textLight,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   unreadBadge: {
@@ -104,14 +113,18 @@ export const chatScreenStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
+    shadowColor: colors.secondary,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
   },
   unreadCount: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.white,
+    color: colors.textPrimary,
   },
   
-  // Empty State
+  // Empty State - Dark Theme
   emptyState: {
     flex: 1,
     alignItems: 'center',
@@ -121,32 +134,34 @@ export const chatScreenStyles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.textMedium,
+    color: colors.textPrimary,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.textSecondary,
     textAlign: 'center',
     fontWeight: '400',
   },
   
-  // Floating Action Button
+  // Floating Action Button - Neon Gradient
   fab: {
     position: 'absolute',
     bottom: 730, // Bottom navigation bar'ın üstüne taşıdık
     right: 20,
-    width: 48,
-    height: 48,
+    width: 56,
+    height: 56,
     borderRadius: 28,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: colors.outlineGrey,
   },
 }); 

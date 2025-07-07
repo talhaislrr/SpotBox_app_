@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, Animated, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { SafeAreaView, Animated, Text, View, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-import { colors } from '../constants/colors';
+import { colors, colorCombinations } from '../constants/colors';
 import { springConfigs, timingConfigs, tabAnimationValues } from '../constants/animations';
 import { chatScreenStyles } from '../styles/chatScreenStyles';
 
 const ChatScreen = () => {
+  const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(tabAnimationValues.translate.left)).current;
   
@@ -58,7 +60,11 @@ const ChatScreen = () => {
   }, []);
 
   const renderChatItem = ({ item }) => (
-    <TouchableOpacity style={chatScreenStyles.chatCard} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={chatScreenStyles.chatCard}
+      activeOpacity={0.7}
+      onPress={() => navigation.navigate('ChatConversation', { user: item })}
+    >
       <View style={chatScreenStyles.chatInfo}>
         <View style={chatScreenStyles.avatarContainer}>
           <Text style={chatScreenStyles.avatar}>{item.avatar}</Text>
@@ -82,8 +88,9 @@ const ChatScreen = () => {
 
   return (
     <SafeAreaView style={chatScreenStyles.container}>
-      <Animated.View 
+      <Animated.View
         style={[
+          { flex: 1 },
           chatScreenStyles.content,
           {
             opacity: fadeAnim,

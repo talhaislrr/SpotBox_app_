@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { SafeAreaView, Animated, Text } from 'react-native';
+import { SafeAreaView, Animated, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import { colors } from '../constants/colors';
 import { springConfigs, timingConfigs, tabAnimationValues } from '../constants/animations';
 import { globalStyles } from '../styles/globalStyles';
 
 const LibraryScreen = () => {
+  const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(tabAnimationValues.translate.right)).current;
   
@@ -27,17 +29,20 @@ const LibraryScreen = () => {
 
   return (
     <SafeAreaView style={globalStyles.container}>
-      <Animated.View 
+      <Animated.View
         style={[
-          globalStyles.content,
+          { flex: 1 },
           {
+            backgroundColor: colors.background,
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           },
         ]}
       >
-        <Text style={globalStyles.title}>Kütüphane</Text>
-        <Text style={globalStyles.subtitle}>Müzik koleksiyonun</Text>
+        <View style={globalStyles.content}>
+          <Text style={globalStyles.title}>Kütüphane</Text>
+          <Text style={globalStyles.subtitle}>Müzik koleksiyonun</Text>
+        </View>
       </Animated.View>
     </SafeAreaView>
   );

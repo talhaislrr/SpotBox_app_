@@ -25,6 +25,9 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "SpotBox konum tabanlı müzik keşfi için konumunuzu kullanır."
       },
+      "config": {
+        "googleMapsApiKey": "AIzaSyBXJcpzOL26QD1mucMjiyDFiaV1konkcyk"
+      },
       "bundleIdentifier": "com.anonymous.spotbox"
     },
     "android": {
@@ -40,6 +43,11 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBXJcpzOL26QD1mucMjiyDFiaV1konkcyk"
+        }
+      },
       "package": "com.anonymous.spotbox"
     },
     "web": {
@@ -63,12 +71,6 @@
         {
           "cameraPermission": "Bu uygulama müzik içerikleri için fotoğraf çekmek amacıyla kamera kullanır.",
           "microphonePermission": "Bu uygulama müzik içerikleri için ses kaydetmek amacıyla mikrofon kullanır."
-        }
-      ],
-      [
-        "@maplibre/maplibre-react-native",
-        {
-          "iosLocationUsageDescription": "SpotBox harita üzerinde konumunuzu göstermek için yer bilgisine ihtiyaç duyar."
         }
       ]
     ],

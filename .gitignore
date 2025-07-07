@@ -1,0 +1,7 @@
+node_modules
+android/app/build
+ios/Pods
+.expo
+.expo-shared
+.idea
+.DS_Store
