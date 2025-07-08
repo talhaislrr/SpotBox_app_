@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, StatusBar, Image, Alert, Animated, TouchableOpacity, SafeAreaView, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import MapView, { Marker, Circle } from 'react-native-maps';
@@ -9,6 +9,7 @@ import { colors } from '../constants/colors';
 import { defaultRegions } from '../constants/mapStyles';
 import { springConfigs, timingConfigs } from '../constants/animations';
 import { homeScreenStyles } from '../styles/homeScreenStyles';
+import { BoxesContext } from '../context/BoxesContext';
 
 const generateHtml = (lat, lng, styleJson) => `<!DOCTYPE html>
 <html>
@@ -53,6 +54,8 @@ const HomeScreen = ({ navigation }) => {
   const boxButtonScale = useRef(new Animated.Value(1)).current;
   const mapButtonScale = useRef(new Animated.Value(1.2)).current; // HomeScreen'de olduğumuz için büyük
   const chatButtonScale = useRef(new Animated.Value(1)).current;
+
+  const { boxes } = useContext(BoxesContext);
 
   useEffect(() => {
     const initializeLocation = async () => {
@@ -279,6 +282,22 @@ const HomeScreen = ({ navigation }) => {
                 fillColor={colors.primary + '0A'}
               />
             )}
+
+            {/* Context'ten box marker'ları */}
+            {boxes.map((box) => (
+              <Marker
+                key={box.id}
+                coordinate={box.location}
+                title="SpotBox"
+                description="Fotoğraf Kutusu"
+              >
+                <Image
+                  source={require('../../assets/box_closed.png')}
+                  style={{ width: 24, height: 24 }}
+                  resizeMode="contain"
+                />
+              </Marker>
+            ))}
 
             {/* Örnek müzik spot'ları - Secondary Magenta */}
             <Marker

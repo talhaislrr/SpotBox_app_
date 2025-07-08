@@ -4,15 +4,18 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { StackNavigator } from './src/navigation/StackNavigator';
+import { BoxesProvider } from './src/context/BoxesContext';
 
 // SpotBox - Konum Tabanlı Müzik Uygulaması
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <StackNavigator />
-        <StatusBar style="auto" />
-      </NavigationContainer>
+      <BoxesProvider>
+        <NavigationContainer>
+          <StackNavigator />
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </BoxesProvider>
     </SafeAreaProvider>
   );
 } 
