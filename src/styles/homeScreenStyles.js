@@ -20,8 +20,7 @@ export const homeScreenStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    position: 'relative', // Logo için absolute positioning yapmak için
+    paddingHorizontal: 12, // Design system: s3 = 12dp
   },
   modernButton: {
     width: 60,
@@ -51,7 +50,6 @@ export const homeScreenStyles = StyleSheet.create({
     shadowOpacity: 0.45,
     shadowRadius: 10,
     elevation: 10,
-    zIndex: 2, // Logo'nun üzerinde görünmesi için
   },
   profileImageContainer: {
     width: '100%',
@@ -86,7 +84,6 @@ export const homeScreenStyles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 30,
     elevation: 14,
-    zIndex: 2, // Logo'nun üzerinde görünmesi için
   },
   friendRequestIcon: {
     width: 35,
@@ -132,31 +129,35 @@ export const homeScreenStyles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    top: 0,
-    bottom: 0,
+    bottom: 112, // Design system: Bottom bar'ın (72dp) + s6 (24dp) + s4 (16dp) üzerine
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1, // Butonların arkasında kalmasın
+    zIndex: 1000, // Bottom bar'ın üzerinde görünmesi için
   },
   overlayLogo: {
-    width: 72, // Design system: Toolbar logo uygun boyut
-    height: 44, // Design system: Toolbar logo uygun boyut
+    width: 80, // Design system: FAB boyutu + s2 (8dp) büyütüldü
+    height: 80, // Design system: FAB boyutu + s2 (8dp) büyütüldü - perfect circle
     backgroundColor: colors.surfaceGrey,
-    borderRadius: 16, // Design system: roundness = 16dp
-    paddingHorizontal: 12, // Design system: s3 = 12dp
-    paddingVertical: 8, // Design system: s2 = 8dp
+    borderRadius: 40, // Design system: Perfect circle (width/2)
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 }, // Design system: elevation2 = 4dp
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 4, // Design system: elevation2 = 4
-    borderWidth: 1,
-    borderColor: colors.outlineGrey,
+    borderWidth: 2, // Design system: Thicker border for camera button
+    borderColor: colors.textPrimary, // White border
+  },
+  logoAsset: {
+    width: 44, // Design system: Logo asset boyutu (80dp container'a uygun)
+    height: 44, // Design system: Logo asset boyutu (80dp container'a uygun)
+    // tintColor kaldırıldı - orijinal renklerinde görünecek
   },
   locationButtonContainer: {
     position: 'absolute',
-    bottom: 100,
-    right: 16, // sağ kenara 16px boşluk
+    bottom: 112, // Design system: Kamera butonu ile aynı seviye
+    right: 16, // Design system: s4 = 16dp
     zIndex: 1000,
   },
   locationButton: {
@@ -181,7 +182,7 @@ export const homeScreenStyles = StyleSheet.create({
   // Modern Animated FAB Styles - Neon Gradient
   fabContainer: {
     position: 'absolute',
-    bottom: 120,
+    bottom: 212, // Design system: Logo'nun (112dp) + logo height (80dp) + s5 (20dp) üzerine
     alignSelf: 'center',
     width: 70,
     height: 70,

@@ -400,14 +400,8 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </TouchableOpacity>
             
-            {/* Orta - Logo */}
-            <View style={homeScreenStyles.logoContainer}>
-              <Image 
-                source={require('../../SpotBox_Logo.png')} 
-                style={homeScreenStyles.overlayLogo}
-                resizeMode="contain"
-              />
-            </View>
+            {/* Orta - Boş alan (Logo bottom'a taşındı) */}
+            <View style={{ flex: 1 }} />
             
             {/* Sağ üst - Arkadaşlık isteği butonu */}
             <TouchableOpacity 
@@ -428,6 +422,21 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </SafeAreaView>
       </Animated.View>
+      
+      {/* Bottom Logo - Kamera butonu tarzı circular design */}
+      <View style={homeScreenStyles.logoContainer}>
+        <TouchableOpacity 
+          style={homeScreenStyles.overlayLogo}
+          activeOpacity={0.9}
+          onPress={() => navigation.navigate('Camera')}
+        >
+          <Image 
+            source={require('../../SpotBox_Logo.png')} 
+            style={homeScreenStyles.logoAsset}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
       
       {/* Konum Butonu - Bottom bar'ın üstüne sağ tarafa */}
       <Animated.View
