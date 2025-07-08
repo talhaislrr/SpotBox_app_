@@ -21,6 +21,7 @@ export const homeScreenStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 12,
+    position: 'relative', // Logo için absolute positioning yapmak için
   },
   modernButton: {
     width: 60,
@@ -38,14 +39,19 @@ export const homeScreenStyles = StyleSheet.create({
     elevation: 12,
   },
   profileButtonHeader: {
-    backgroundColor: colors.surfaceGrey,
-    shadowColor: colors.primary,
+    backgroundColor: 'transparent', // arkaplan kaldırıldı
+    shadowColor: colors.primary, // neon mavi gölge eklendi
     padding: 2,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: colors.primary,
+    width: 48, // Design system: min touch target 48x48dp
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 0, // çizgi kaldırıldı
+    borderColor: 'transparent',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: 2, // Logo'nun üzerinde görünmesi için
   },
   profileImageContainer: {
     width: '100%',
@@ -59,38 +65,44 @@ export const homeScreenStyles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    backgroundColor: colors.surfaceGrey,
-    shadowColor: colors.primary,
+    borderWidth: 0, // çizgi kaldırıldı
+    borderColor: 'transparent',
+    backgroundColor: 'transparent', // arkaplan kaldırıldı
+    shadowColor: colors.primary, // neon mavi gölge
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    elevation: 10,
   },
   friendRequestButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'transparent', // arka plan kaldırıldı
-    borderWidth: 0,
-    shadowColor: colors.secondary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8, // daha yumuşak gölge
-    elevation: 8,
+    backgroundColor: 'transparent', // arkaplan kaldırıldı
+    borderWidth: 0, // çizgisiz
+    borderColor: 'transparent',
+    shadowColor: colors.secondary, // magenta glow
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 30,
+    elevation: 14,
+    zIndex: 2, // Logo'nun üzerinde görünmesi için
   },
   friendRequestIcon: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
+    tintColor: colors.textSecondary, // koyu gri
+    marginTop: -3,
+    marginLeft: -6,
   },
   buttonGlow: {
     width: '100%',
     height: '100%',
-    borderRadius: 30,
+    borderRadius: 24, // containerla aynı radius
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    // iç glow kaldırıldı – sadece dış glow kullanılacak
   },
   notificationBadge: {
     position: 'absolute',
@@ -117,22 +129,27 @@ export const homeScreenStyles = StyleSheet.create({
     textAlign: 'center',
   },
   logoContainer: {
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 1, // Butonların arkasında kalmasın
   },
   overlayLogo: {
-    width: 120,
-    height: 60,
+    width: 72, // Design system: Toolbar logo uygun boyut
+    height: 44, // Design system: Toolbar logo uygun boyut
     backgroundColor: colors.surfaceGrey,
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    borderRadius: 16, // Design system: roundness = 16dp
+    paddingHorizontal: 12, // Design system: s3 = 12dp
+    paddingVertical: 8, // Design system: s2 = 8dp
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 4 }, // Design system: elevation2 = 4dp
     shadowOpacity: 0.3,
     shadowRadius: 20,
-    elevation: 16,
+    elevation: 4, // Design system: elevation2 = 4
     borderWidth: 1,
     borderColor: colors.outlineGrey,
   },
@@ -158,6 +175,7 @@ export const homeScreenStyles = StyleSheet.create({
   locationIcon: {
     width: 30,
     height: 30,
+    tintColor: colors.textSecondary, // koyu gri
   },
   
   // Modern Animated FAB Styles - Neon Gradient

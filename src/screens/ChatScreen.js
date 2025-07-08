@@ -67,7 +67,9 @@ const ChatScreen = () => {
     >
       <View style={chatScreenStyles.chatInfo}>
         <View style={chatScreenStyles.avatarContainer}>
-          <Text style={chatScreenStyles.avatar}>{item.avatar}</Text>
+          <View style={chatScreenStyles.avatar}>
+            <Text style={chatScreenStyles.avatarText}>{item.avatar}</Text>
+          </View>
           {item.isOnline && <View style={chatScreenStyles.onlineIndicator} />}
         </View>
         <View style={chatScreenStyles.chatDetails}>

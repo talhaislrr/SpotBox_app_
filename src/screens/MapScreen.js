@@ -104,6 +104,7 @@ const MapScreen = () => {
             showsUserLocation={true}
             showsMyLocationButton={true}
             customMapStyle={[]}
+            userInterfaceStyle="dark"
           >
             {/* Kullanıcı konumu marker'ı */}
             {location && (

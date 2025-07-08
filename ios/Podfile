@@ -46,6 +46,8 @@ target 'SpotBox' do
   )
 
   post_install do |installer|
+    # Xcode build script'lerinin nvm/volta ortamı olmadan da node'u bulması için
+    ENV['NODE_BINARY'] = '/opt/homebrew/bin/node'
     react_native_post_install(
       installer,
       config[:reactNativePath],

@@ -1,0 +1,14 @@
+
+> spotbox@1.0.0 cli:ios
+> npx react-native run-ios --udid 00008140-0011245C2E52801C --verbose
+
+info Found Xcode workspace "SpotBox.xcworkspace"
+info Building (using "xcodebuild -workspace SpotBox.xcworkspace -configuration Debug -scheme SpotBox -destination id=00008140-0011245C2E52801C")
+debug Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -workspace SpotBox.xcworkspace -configuration Debug -scheme SpotBox -destination id=00008140-0011245C2E52801C
+
+
+
+info 💡 Tip: Make sure that you have set up your development environment correctly, by running npx react-native doctor. To read more about doctor command visit: https://github.com/react-native-community/cli/blob/main/packages/cli-doctor/README.md#doctor 
+
+error Failed to build ios project. "xcodebuild" exited with error code '70'. To debug build logs further, consider building your app with Xcode.app, by opening 'SpotBox.xcworkspace'.

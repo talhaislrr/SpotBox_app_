@@ -1,0 +1,198 @@
+SpotBox – Design System (v2025-07-08 · Extended)
+
+Canonical, code-friendly spec for every UI decision in SpotBox (Expo + React Native).
+If it isn’t defined here, it doesn’t ship.
+
+⸻
+
+1 · Design Tokens
+
+1.1 Spacing Scale  (dp)
+
+Token	Px	Purpose
+s0	0	none – edge flush
+s1	4	hairline gap / icon inset
+s2	8	tiny chip-chip distance
+s3	12	label ↔ field, card insets
+s4	16	default horizontal padding
+s5	20	large section gap
+s6	24	FAB offset / bar clear
+s8	32	sheet header breathing
+
+Rule 1  Every margin*, padding*, gap, flexGap MUST equal one of these. No literal pixels.
+
+1.2 Corner Radius & Elevation
+
+Name	Value	Usage
+roundness	16 dp	global – all Surfaces
+elevation0	0	base / map
+elevation1	2	chips, overlay buttons
+elevation2	4	card, bottom bar, FAB
+
+Rule 2  No custom shadows – stick to level 0-2.
+
+1.3 Color Palettes  (hex)
+
+Light
+
+Role	Hex
+primary	#68B6EF
+secondary	#F49097
+tertiary	#FFE59E
+accent	#A9F870
+surface	#FFFFFF
+background	#F5F7F8
+outline	#E1E3E6
+error	#E84545
+onSurface	#2E2E33
+
+Dark
+
+Role	Hex
+primary	#1BC9F5
+secondary	#FF4FA3
+tertiary	#A9F870
+surface	#1C1C1F
+background	#0E0E0F
+outline	#2E2E33
+error	#E84545
+onSurface	#E6E8EA
+
+Rule 3  Any hex not in this table triggers ESLint design-token/no-raw-color.
+
+1.4 Typography  (sp / weight)
+
+Token	Size	Weight	LineHt
+headlineSmall	24	700	32
+titleMedium	20	600	28
+bodyMedium	16	400	24
+labelSmall	12	500	16
+
+1.5 Breakpoints  (dp width)
+
+Alias	Range
+mobileS	< 360
+mobileM	360–479
+mobileL	480–599
+tablet	600–839
+laptop	840–1279
+
+Reference: Material Responsive Grid (m2.material.io)
+
+1.6 Touch Targets & Hit-Area
+	•	Min 48 × 48 dp (≈9 mm) for any interactive control  (m3.material.io, m2.material.io)
+	•	Keep 8 dp spacing between adjacent targets.
+
+1.7 Icon & Artwork
+
+Kind	Size (dp)
+Toolbar / Tab icon	24 outline
+Map overlay chip	20 outline inside 56 dp Surface
+Floating Action	28 inside 72 dp circle
+
+1.8 Motion Tokens (Material 3) (m3.material.io)
+
+Category	Token	Duration (ms)	Curve
+Spatial–default	motion.medium	300	standardEasing
+Spatial–fast	motion.fast	200	standardEasing
+Fade	motion.fade	150	standardEasing
+Scale springs	motion.spring	250	emphasized
+
+Rule 4  Any animation must use these durations/curves.
+
+⸻
+
+2 · Layout Rules
+
+2.1 Screen Wrapper
+
+<SafeAreaView
+  edges={['top','bottom']}
+  style={{ flex: 1, paddingHorizontal: s4 }}>
+
+2.2 Top App-Bar
+
+Prop	Value
+Height	56 dp
+Elevation	elevation2
+Title	headlineSmall
+Nav-icon hit-box	48 × 48 dp
+
+2.3 Bottom Navigation (Expo + react-navigation)
+
+Prop	Value
+Bar height	72 dp + insets.bottom
+Padding	top  s2, bottom  s3
+Background	surface
+Selected pill	44 × 32 dp, bg secondary @ 16 %
+
+2.4 Floating Action Button (FAB)
+	•	Size 72 dp, shape circle, variant tertiary.
+	•	Position: bottom = insets.bottom + s6, alignSelf:'center'.
+	•	Icon size 28 dp.
+
+2.5 Overlay Map Chips
+	•	Surface 56 dp square, borderRadius: roundness, elevation1.
+	•	Icon 20 dp outline.
+	•	Distance from nearest edge: s3.
+
+2.6 Cards & Sheets
+
+Element	Margin	Padding
+Card	horizontal s4, vertical s3	s4 all around
+Bottom Sheet	top corners roundness, handle inset s2	s4
+
+2.7 Dialog
+	•	Max width 328 dp (portrait), 560 dp (landscape/tablet).
+	•	Vertical inset from top = 16 + insets.top.
+
+⸻
+
+3 · Component Contracts
+
+3.1 MapMarker
+
+interface MapMarkerProps {
+  variant: 'box' | 'bell' | 'pin' | 'lock'
+  coordinate: LatLng
+}
+
+	•	Uses cached PNG (require(...)) tinted primary.
+	•	tracksViewChanges=false once loaded.
+
+3.2 Badge
+	•	Diameter 16 dp, bg = secondary, text style = labelSmall colour #FFFFFF.
+
+3.3 Button Variants (Paper)
+
+Variant	Height	Radius	Padding
+contained	40 dp	roundness	left/right s4
+tonal	40 dp	roundness	s4
+text	40 dp	0	s2
+
+
+⸻
+
+4 · Accessibility
+	•	Contrast ≥ 4.5 : 1 for text (WCAG AA).
+	•	Dynamic Type: scale fonts via react-native-responsive-fontsize.
+	•	TalkBack / VoiceOver: label every control; FAB accessibilityRole="button" accessibilityLabel="Yeni kutu bırak".
+	•	Motion reduce: useReduceMotion(); disable non-essential animation.
+
+⸻
+
+5 · Code Quality Gates
+	•	ESLint rules: no-magic-numbers, react-native/no-inline-styles, design-token/no-raw-color.
+	•	CI step: tsc --noEmit + unit tests pass.
+	•	JS file with // @ts-nocheck must not reach main branch.
+
+⸻
+
+6 · Change Management
+	1.	Update token tables and theme/ TS constants in the same PR.
+	2.	Run npm run lint && npm test – green CI required.
+	3.	Tag release; EAS Update for JS-only, new build if native asset changes.
+
+⸻
+
+End of Design System.  Feel free to extend but never bypass these rules.

@@ -234,6 +234,7 @@ const HomeScreen = ({ navigation }) => {
             zoomEnabled={true}
             region={currentRegion}
             customMapStyle={[]}
+            userInterfaceStyle="dark"
           >
             {/* Kullanıcı konumu marker'ı - Neon Cyan */}
             {location && (
@@ -373,8 +374,7 @@ const HomeScreen = ({ navigation }) => {
           resizeMode="contain"
           pointerEvents="none"
         />
-        {/* Dark overlay to simulate dark mode on Apple Maps */}
-        <View style={homeScreenStyles.mapDarkOverlay} pointerEvents="none" />
+        {/* MapKit↗︎ dark mode doğrudan etkin; ek overlay kaldırıldı */}
       </Animated.View>
 
       {/* Üst Header */}
