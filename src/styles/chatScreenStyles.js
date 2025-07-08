@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+Style////import { StyleSheet } from 'react-native';
 import { colors, colorCombinations } from '../constants/colors';
 
 export const chatScreenStyles = StyleSheet.create({
@@ -55,15 +55,18 @@ export const chatScreenStyles = StyleSheet.create({
     marginRight: 12,
   },
   avatar: {
-    fontSize: 32,
     width: 48,
     height: 48,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: colors.primary,
     borderRadius: 24,
     overflow: 'hidden',
-    color: colors.textPrimary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceGrey,
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   onlineIndicator: {
     position: 'absolute',
@@ -164,4 +167,4 @@ export const chatScreenStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.outlineGrey,
   },
-}); 
+});

@@ -56,6 +56,10 @@ const HomeScreen = ({ navigation }) => {
   const chatButtonScale = useRef(new Animated.Value(1)).current;
 
   const { boxes } = useContext(BoxesContext);
+  // BoxesContext güncellemelerini konsola yazdır
+  useEffect(() => {
+    console.log('HomeScreen boxes güncellendi:', boxes);
+  }, [boxes]);
 
   useEffect(() => {
     const initializeLocation = async () => {
@@ -219,6 +223,8 @@ const HomeScreen = ({ navigation }) => {
       >
         <View style={homeScreenStyles.fullScreenMap}>
           <MapView
+            // MapView yeniden render için key boxes.length'e bağlı
+            key={`map-${boxes.length}`}
             ref={mapRef}
             style={homeScreenStyles.fullScreenMap}
             provider={Platform.OS === 'android' ? 'google' : undefined}
@@ -248,24 +254,14 @@ const HomeScreen = ({ navigation }) => {
                 }}
                 title="Konumum"
                 description="Şu anda buradayım"
+                zIndex={0}
+                tracksViewChanges={false}
               >
-                <View style={{
-                  backgroundColor: colors.primary,
-                  borderRadius: 12,
-                  width: 24,
-                  height: 24,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: 2,
-                  borderColor: colors.textPrimary,
-                }}>
-                  <View style={{
-                    backgroundColor: colors.textPrimary,
-                    borderRadius: 6,
-                    width: 8,
-                    height: 8,
-                  }} />
-                </View>
+                <Image
+                  source={require('../../assets/current_loc.png')}
+                  style={{ width: 48, height: 48 }}
+                  resizeMode="contain"
+                />
               </Marker>
             )}
 
@@ -290,12 +286,26 @@ const HomeScreen = ({ navigation }) => {
                 coordinate={box.location}
                 title="SpotBox"
                 description="Fotoğraf Kutusu"
+                zIndex={1}
               >
-                <Image
-                  source={require('../../assets/box_closed.png')}
-                  style={{ width: 24, height: 24 }}
-                  resizeMode="contain"
-                />
+                <View style={{
+                  width: 50,
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: 'transparent',
+                  shadowColor: colors.primary,
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.8,
+                  shadowRadius: 15,
+                  elevation: 10,
+                }}>
+                  <Image
+                    source={require('../../assets/box_closed.png')}
+                    style={{ width: 40, height: 40 }}
+                    resizeMode="contain"
+                  />
+                </View>
               </Marker>
             ))}
 
@@ -407,6 +417,7 @@ const HomeScreen = ({ navigation }) => {
           <View style={homeScreenStyles.headerContainer}>
             {/* Sol üst - Profil butonu */}
             <TouchableOpacity 
+              onPress={() => navigation.navigate('Profile')}
               style={[homeScreenStyles.modernButton, homeScreenStyles.profileButtonHeader]}
               activeOpacity={0.7}
             >

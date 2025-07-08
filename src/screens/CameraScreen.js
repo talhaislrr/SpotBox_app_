@@ -45,6 +45,13 @@ const CameraScreen = ({ navigation }) => {
     getCurrentLocation();
   }, []);
 
+  // Cleanup: stop camera preview when screen unmounts
+  useEffect(() => {
+    return () => {
+      cameraRef.current?.pausePreview?.();
+    };
+  }, []);
+
   const getCurrentLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -148,19 +155,10 @@ const CameraScreen = ({ navigation }) => {
     addBox(boxData);
     console.log('Box bırakıldı:', boxData);
     
-    Alert.alert(
-      'Box Bırakıldı! 📦',
-      'Fotoğrafların haritaya yerleştirildi.',
-      [
-        {
-          text: 'Tamam',
-          onPress: () => {
-            // TabNavigator içindeki Home ekranına dön
-            navigation.navigate('Main', { screen: 'Home' });
-          },
-        },
-      ]
-    );
+    // Fotoğraf gönderildikten sonra context güncellemesi için kısa gecikme ekliyorum
+    setTimeout(() => {
+      navigation.goBack();
+    }, 300);
   };
 
   const resetCapture = () => {

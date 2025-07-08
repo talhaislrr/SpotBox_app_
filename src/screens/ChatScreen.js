@@ -1,11 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, Animated, Text, View, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+ChatScreen///import React, { useEffect, useRef, useState } from 'react';
+import { SafeAreaView, Animated, Text, View, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 import { colors, colorCombinations } from '../constants/colors';
 import { springConfigs, timingConfigs, tabAnimationValues } from '../constants/animations';
 import { chatScreenStyles } from '../styles/chatScreenStyles';
+
+// Mimoji imports
+const mimojiDurul = require('../../assets/mimoji_durul.png');
+const mimojiBlue = require('../../assets/mimoji_blue.png');
+const imageCopy = require('../../assets/mimoji_durul.png');
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -20,16 +25,16 @@ const ChatScreen = () => {
       lastMessage: 'Box\'ını açtım, harika fotoğraf! 📸', 
       time: '2dk önce',
       isOnline: true, 
-      avatar: '👩',
+      avatar: mimojiBlue,
       unreadCount: 2 
     },
     { 
       id: 2, 
-      name: 'Mehmet', 
+      name: 'Durul', 
       lastMessage: 'Yakında yeni box bıraktım, kontrol et', 
       time: '5dk önce',
       isOnline: false, 
-      avatar: '👨',
+      avatar: imageCopy,
       unreadCount: 0 
     },
     { 
@@ -38,7 +43,7 @@ const ChatScreen = () => {
       lastMessage: 'Merhaba! Nasılsın?', 
       time: '1s önce',
       isOnline: true, 
-      avatar: '👱‍♀️',
+      avatar: mimojiDurul,
       unreadCount: 1 
     },
   ]);
@@ -67,8 +72,26 @@ const ChatScreen = () => {
     >
       <View style={chatScreenStyles.chatInfo}>
         <View style={chatScreenStyles.avatarContainer}>
-          <View style={chatScreenStyles.avatar}>
-            <Text style={chatScreenStyles.avatarText}>{item.avatar}</Text>
+          <View style={[
+            chatScreenStyles.avatar,
+            item.name === 'Durul' && { backgroundColor: 'transparent' }
+          ]}>
+            <Image 
+              source={item.avatar} 
+              style={[
+                chatScreenStyles.avatarImage,
+                (item.name === 'Ayşe' || item.name === 'Durul') && { 
+                  width: 36, 
+                  height: 36, 
+                  borderRadius: 18,
+                  marginHorizontal: 6,
+                  marginVertical: 6
+                }
+              ]}
+              resizeMode="cover"
+              onLoad={() => console.log(`Avatar yüklendi: ${item.name}`)}
+              onError={(error) => console.log(`Avatar yükleme hatası: ${item.name}`, error)}
+            />
           </View>
           {item.isOnline && <View style={chatScreenStyles.onlineIndicator} />}
         </View>
@@ -131,4 +154,4 @@ const ChatScreen = () => {
   );
 };
 
-export default ChatScreen; 
+export default ChatScreen;
