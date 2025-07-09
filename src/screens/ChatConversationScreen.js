@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Animated } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { colors } from '../constants/colors';
 import { springConfigs, timingConfigs } from '../constants/animations';
 import { chatConversationStyles } from '../styles/chatConversationStyles';
+const headerImageCopy = require('../../assets/image copy.png');
+const messageImageCopy2 = require('../../assets/image copy 2.png');
 
 const ChatConversationScreen = () => {
   const navigation = useNavigation();
@@ -44,14 +46,35 @@ const ChatConversationScreen = () => {
   };
 
   const renderMessage = ({ item }) => (
-    <View
-      style={[
-        chatConversationStyles.messageBubble,
-        item.isMe ? chatConversationStyles.myBubble : chatConversationStyles.theirBubble,
-      ]}
-    >
-      <Text style={chatConversationStyles.messageText}>{item.text}</Text>
-      <Text style={chatConversationStyles.timeText}>{item.time}</Text>
+    <View style={[
+      chatConversationStyles.messageContainer,
+      item.isMe ? chatConversationStyles.myMessageContainer : chatConversationStyles.theirMessageContainer,
+      !item.isMe && { flexDirection: 'column', alignItems: 'flex-start' }
+    ]}>
+      {!item.isMe && (
+        <View style={[
+          chatConversationStyles.messageAvatarContainer,
+          user.name === 'Durul' && { backgroundColor: 'transparent' }
+        ]}>
+          <Image 
+            source={user.name === 'Durul' ? messageImageCopy2 : user.avatar} 
+            style={[
+              chatConversationStyles.messageAvatar,
+              user.name === 'Durul' && { backgroundColor: 'transparent' }
+            ]}
+            resizeMode="cover"
+          />
+        </View>
+      )}
+      <View
+        style={[
+          chatConversationStyles.messageBubble,
+          item.isMe ? chatConversationStyles.myBubble : chatConversationStyles.theirBubble,
+        ]}
+      >
+        <Text style={chatConversationStyles.messageText}>{item.text}</Text>
+        <Text style={chatConversationStyles.timeText}>{item.time}</Text>
+      </View>
     </View>
   );
 
@@ -62,7 +85,33 @@ const ChatConversationScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={chatConversationStyles.backButton}>
           <Ionicons name="chevron-back" size={28} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={chatConversationStyles.headerTitle}>{user.name}</Text>
+        
+        <View style={[
+          chatConversationStyles.avatarContainer,
+          user.name === 'Durul' && { backgroundColor: 'transparent' }
+        ]}>
+          <Image 
+            source={user.name === 'Durul' ? headerImageCopy : user.avatar} 
+            style={[
+              chatConversationStyles.headerAvatar,
+              user.name === 'Durul' && { backgroundColor: 'transparent' }
+            ]}
+            resizeMode="cover"
+          />
+        </View>
+        
+        <View style={chatConversationStyles.userInfoContainer}>
+          <Text style={chatConversationStyles.headerTitle}>{user.name}</Text>
+          <Text style={chatConversationStyles.lastSeenText}>
+            {user.isOnline ? 'Çevrimiçi' : 'Son görülme: 5dk önce'}
+          </Text>
+        </View>
+        
+        <View style={chatConversationStyles.headerButtons}>
+          <TouchableOpacity style={chatConversationStyles.headerButton}>
+            <Ionicons name="ellipsis-vertical" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Messages */}

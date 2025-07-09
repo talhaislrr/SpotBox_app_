@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, StatusBar, Image, Alert, Animated, TouchableOpacity, SafeAreaView, Text, StyleSheet, Platform } from 'react-native';
+import { View, StatusBar, Alert, Animated, TouchableOpacity, SafeAreaView, Modal, Text, StyleSheet, Platform, Dimensions, Image } from 'react-native';
+// CloudImage kullanımı kaldırıldı; native Image bileşeni ile URL’den gösteriliyor
 import { Ionicons } from '@expo/vector-icons';
-import MapView, { Marker, Circle } from 'react-native-maps';
+import MapView, { Marker, Circle, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -55,7 +56,19 @@ const HomeScreen = ({ navigation }) => {
   const mapButtonScale = useRef(new Animated.Value(1.2)).current; // HomeScreen'de olduğumuz için büyük
   const chatButtonScale = useRef(new Animated.Value(1)).current;
 
-  const { boxes } = useContext(BoxesContext);
+  const { boxes, clearBoxes } = useContext(BoxesContext);
+  const [selectedBox, setSelectedBox] = useState(null);
+  const [isSwapped, setIsSwapped] = useState(false);
+
+  // Prefetch images so swapping is instant
+  useEffect(() => {
+    if (selectedBox) {
+      Image.prefetch(selectedBox.photos[0]);
+      Image.prefetch(selectedBox.photos[1]);
+    }
+  }, [selectedBox]);
+
+  const handleBoxPhotoOpen = (box) => { setSelectedBox(box); setIsSwapped(false); };
   // BoxesContext güncellemelerini konsola yazdır
   useEffect(() => {
     console.log('HomeScreen boxes güncellendi:', boxes);
@@ -282,11 +295,12 @@ const HomeScreen = ({ navigation }) => {
             {/* Context'ten box marker'ları */}
             {boxes.map((box) => (
               <Marker
-                key={box.id}
+                key={box._id}
                 coordinate={box.location}
                 title="SpotBox"
                 description="Fotoğraf Kutusu"
                 zIndex={1}
+                onPress={() => handleBoxPhotoOpen(box)}
               >
                 <View style={{
                   width: 50,
@@ -306,6 +320,11 @@ const HomeScreen = ({ navigation }) => {
                     resizeMode="contain"
                   />
                 </View>
+                <Callout tooltip onPress={() => handleBoxPhotoOpen(box)}>
+                  <View style={styles.calloutContent}>
+                    <Text style={styles.calloutText}>Fotoğrafları Göster</Text>
+                  </View>
+                </Callout>
               </Marker>
             ))}
 
@@ -436,18 +455,18 @@ const HomeScreen = ({ navigation }) => {
             {/* Sağ üst - Arkadaşlık isteği butonu */}
             <TouchableOpacity 
               style={[homeScreenStyles.modernButton, homeScreenStyles.friendRequestButton]}
+              onPress={clearBoxes}
               activeOpacity={0.7}
             >
-              <View style={homeScreenStyles.buttonGlow}>
-                <Image 
-                  source={require('../../assets/request.png')} 
-                  style={homeScreenStyles.friendRequestIcon}
-                  resizeMode="contain"
-                />
-                <View style={homeScreenStyles.notificationBadge}>
-                  <Text style={homeScreenStyles.badgeText}>3</Text>
-                </View>
-              </View>
+              <Ionicons name="person-add" size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
+            {/* Geliştirme: Tüm kutuları temizle butonu */}
+            <TouchableOpacity
+              onPress={clearBoxes}
+              style={[homeScreenStyles.modernButton, homeScreenStyles.friendRequestButton]}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="trash" size={24} color={colors.error} />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -507,8 +526,64 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Animated.View>
       </Animated.View>
+      {/* Box Fotoğraf Modalı */}
+      {selectedBox && (
+        <Modal visible transparent animationType="slide" onRequestClose={() => setSelectedBox(null)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.modalClose} onPress={() => setSelectedBox(null)}>
+                <Ionicons name="close" size={24} color="white" />
+              </TouchableOpacity>
+              {/* Fotoğraf wrapper */}
+              <View style={styles.photoWrapper}>
+                <Image
+                  source={{ uri: selectedBox.photos[isSwapped ? 1 : 0] }}
+                  style={styles.fullPhoto}
+                  resizeMode="cover"
+                />
+                {/* Arka kamera küçük overlay - tıklayınca yer değiştir */}
+                <TouchableOpacity style={styles.thumbWrapper} onPress={() => setIsSwapped(!isSwapped)}>
+                  <Image
+                    source={{ uri: selectedBox.photos[isSwapped ? 0 : 1] }}
+                    style={styles.thumbPhoto}
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
 
+// Local styles for modal & callout
+const styles = StyleSheet.create({
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: Dimensions.get('window').width * 0.9, backgroundColor: '#0E0E0F', borderRadius: 8, padding: 0 },
+  modalClose: {
+    position: 'absolute', top: 20, left: 20, zIndex: 2,
+    backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, padding: 6,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.8, shadowRadius: 4, elevation: 8,
+  },
+  photoWrapper: {
+    position: 'relative',
+    width: '100%',
+    height: Dimensions.get('window').height * 0.8,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  fullPhoto: { width: '100%', height: '100%' },
+  thumbWrapper: { position: 'absolute', top: 16, right: 16, zIndex: 2 },
+  thumbPhoto: {
+    width: Dimensions.get('window').width * 0.35,
+    height: Dimensions.get('window').width * 0.35,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#FFF',
+  },
+  calloutContent: { backgroundColor: '#FFF', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
+  calloutText: { color: '#000', fontSize: 14 },
+});
 export default HomeScreen; 

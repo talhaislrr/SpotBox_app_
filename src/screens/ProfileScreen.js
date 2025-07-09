@@ -1,11 +1,28 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../constants/colors';
+import { AuthContext } from '../context/AuthContext';
+import { getProfile } from '../services/apiAuth';
 
 const ProfileScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { user, logout } = useContext(AuthContext);
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await getProfile();
+        setProfileData(data);
+      } catch (error) {
+        console.error('Profil verisi alınamadı:', error);
+        Alert.alert('Hata', error.message);
+      }
+    };
+    if (user) loadProfile();
+  }, [user]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>  
@@ -20,8 +37,8 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.avatarContainer}>
           <Image source={require('../../assets/profile_avatar.png')} style={styles.avatar} />
         </View>
-        <Text style={styles.name}>Kullanıcı Adı</Text>
-        <Text style={styles.email}>user@example.com</Text>
+        <Text style={styles.name}>{profileData?.username || user?.email || 'Kullanıcı Adı'}</Text>
+        <Text style={styles.email}>{profileData?.email || user?.email || ''}</Text>
         <View style={styles.optionList}>
           <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('ProfileEdit')}>
             <Text style={styles.optionText}>Profil Düzenle</Text>
@@ -29,7 +46,7 @@ const ProfileScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.optionItem}>
             <Text style={styles.optionText}>Ayarlar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.optionItem}>
+          <TouchableOpacity style={styles.optionItem} onPress={logout}>
             <Text style={[styles.optionText, { color: colors.error }]}>Çıkış Yap</Text>
           </TouchableOpacity>
         </View>

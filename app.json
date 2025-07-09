@@ -74,10 +74,12 @@
         }
       ]
     ],
+    "eas": {
+      "projectId": "351953b3-1ad5-46f7-b825-976d836489b5"
+    },
     "extra": {
-      "eas": {
-        "projectId": "351953b3-1ad5-46f7-b825-976d836489b5"
-      }
+      "CLOUDINARY_CLOUD_NAME": "dcp1cc0zd",
+      "CLOUDINARY_UPLOAD_PRESET": "spotbox_unsigned"
     }
   }
 }

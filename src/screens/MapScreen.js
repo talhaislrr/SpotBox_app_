@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,14 @@ import {
   Platform,
   Alert,
   Dimensions,
+  Modal,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { BoxesContext } from '../context/BoxesContext';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -27,6 +30,9 @@ const MapScreen = () => {
     longitudeDelta: 0.01,
   });
   const [location, setLocation] = useState(null);
+  const { boxes } = useContext(BoxesContext);
+  const [selectedBox, setSelectedBox] = useState(null);
+  const handleBoxPress = (box) => setSelectedBox(box);
 
   // Konum izni ve mevcut konumu al
   React.useEffect(() => {
@@ -127,6 +133,19 @@ const MapScreen = () => {
                 onPress={() => handleLocationSelect(location)}
               />
             ))}
+            {boxes.map((box) => (
+              <Marker
+                key={box.id}
+                coordinate={{ latitude: box.location.latitude, longitude: box.location.longitude }}
+                onPress={() => handleBoxPress(box)}
+              >
+                <Callout onPress={() => handleBoxPress(box)} tooltip>
+                  <View style={styles.calloutContent}>
+                    <Text style={styles.calloutText}>Fotoğrafları Göster</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            ))}
           </MapView>
       </View>
 
@@ -160,6 +179,28 @@ const MapScreen = () => {
             <Text style={styles.shareButtonText}>Spot Paylaş</Text>
           </TouchableOpacity>
         </View>
+      )}
+      {/* Box Photos Modal */}
+      {selectedBox && (
+        <Modal visible transparent animationType="slide" onRequestClose={() => setSelectedBox(null)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.modalClose} onPress={() => setSelectedBox(null)}>
+                <Ionicons name="close" size={24} color="white" />
+              </TouchableOpacity>
+              <View style={styles.photoContainer}>
+                {selectedBox.photos.map((photo, idx) => (
+                  <Image
+                    key={idx}
+                    source={{ uri: photo.uri || photo }}
+                    style={styles.photo}
+                    resizeMode="cover"
+                  />
+                ))}
+              </View>
+            </View>
+          </View>
+        </Modal>
       )}
     </SafeAreaView>
   );
@@ -287,6 +328,44 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: screenWidth * 0.9,
+    backgroundColor: '#0E0E0F',
+    borderRadius: 8,
+    padding: 16,
+  },
+  modalClose: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  photoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  photo: {
+    width: screenWidth * 0.42,
+    height: screenWidth * 0.42,
+    borderRadius: 8,
+  },
+  // Callout style
+  calloutContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  calloutText: {
+    color: '#000',
+    fontSize: 14,
   },
 });
 

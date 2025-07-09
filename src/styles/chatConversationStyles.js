@@ -9,30 +9,81 @@ export const chatConversationStyles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingLeft: 8,
+    paddingRight: 16,
+    paddingVertical: 1,
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineGrey,
+    justifyContent: 'space-between',
   },
   backButton: {
     padding: 4,
     marginRight: 8,
+    marginLeft: 8,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: colors.textPrimary,
   },
+  avatarContainer: {
+    marginRight: 8,
+    marginLeft: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerAvatar: {
+    width: 65,
+    height: 65,
+    borderRadius: 32,
+  },
+  userInfoContainer: {
+    justifyContent: 'center',
+    flex: 1,
+    marginLeft: 8,
+  },
+  lastSeenText: {
+    fontSize: 10,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
   messagesContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 8,
+  },
+  myMessageContainer: {
+    justifyContent: 'flex-end',
+  },
+  theirMessageContainer: {
+    justifyContent: 'flex-start',
+  },
+  messageAvatarContainer: {
+    marginRight: 8,
+    marginBottom: 4,
+  },
+  messageAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
   messageBubble: {
     maxWidth: '80%',
     borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    marginBottom: 8,
   },
   myBubble: {
     alignSelf: 'flex-end',

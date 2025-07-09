@@ -8,6 +8,8 @@ import { colors } from '../constants/colors';
 import { springConfigs, timingConfigs } from '../constants/animations';
 import { cameraStyles } from '../styles/cameraStyles';
 import { BoxesContext } from '../context/BoxesContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../services/config';
 
 const CameraScreen = ({ navigation }) => {
   const [permission, requestPermission] = useCameraPermissions();
@@ -140,24 +142,42 @@ const CameraScreen = ({ navigation }) => {
       return;
     }
     
-    // Box verisi oluştur
-    const boxData = {
-      id: Date.now().toString(),
-      location: {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      },
-      photos: capturedPhotos,
-      timestamp: new Date().toISOString(),
-    };
-    
-    // Context'e ekle (ve opsiyonel backend'e gönder)
-    addBox(boxData);
-    console.log('Box bırakıldı:', boxData);
-    
-    // Fotoğraf gönderildikten sonra context güncellemesi için kısa gecikme ekliyorum
+    // Multipart form-data ile server'a gönder
+    try {
+      const formData = new FormData();
+      formData.append('front', {
+        uri: capturedPhotos[0].uri,
+        name: 'front.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('back', {
+        uri: capturedPhotos[1].uri,
+        name: 'back.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('latitude', location.coords.latitude.toString());
+      formData.append('longitude', location.coords.longitude.toString());
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/boxes-upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error('Box upload error');
+      }
+      const data = await response.json();
+      console.log('Box upload success:', data);
+    } catch (error) {
+      console.error('Box upload error:', error);
+      Alert.alert('Hata', 'Fotoğraflar servera yüklenirken bir hata oluştu');
+    }
     setTimeout(() => {
-      navigation.goBack();
+      if (navigation.canGoBack()) navigation.goBack();
+      else navigation.navigate('Main');
     }, 300);
   };
 
