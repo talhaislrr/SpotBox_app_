@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, StatusBar, Alert, Animated, TouchableOpacity, SafeAreaView, Modal, Text, StyleSheet, Platform, Dimensions, Image } from 'react-native';
+import { View, StatusBar, Alert, Animated, TouchableOpacity, SafeAreaView, Modal, Text, TextInput, StyleSheet, Platform, Dimensions, Image, FlatList } from 'react-native';
 // CloudImage kullanımı kaldırıldı; native Image bileşeni ile URL’den gösteriliyor
 import { Ionicons } from '@expo/vector-icons';
 import MapView, { Marker, Circle, Callout } from 'react-native-maps';
@@ -10,9 +10,8 @@ import { colors } from '../constants/colors';
 import { defaultRegions } from '../constants/mapStyles';
 import { springConfigs, timingConfigs } from '../constants/animations';
 import { homeScreenStyles } from '../styles/homeScreenStyles';
+import { getFriendRequests, acceptFriendRequest, rejectFriendRequest, sendFriendRequest } from '../services/apiUsers';
 import { BoxesContext } from '../context/BoxesContext';
-import { AuthContext } from '../context/AuthContext';
-import { sendFriendRequest } from '../services/apiFriends';
 
 const generateHtml = (lat, lng, styleJson) => `<!DOCTYPE html>
 <html>
@@ -60,8 +59,52 @@ const HomeScreen = ({ navigation }) => {
 
   const { boxes, clearBoxes } = useContext(BoxesContext);
   const [selectedBox, setSelectedBox] = useState(null);
+  const [addFriendModalVisible, setAddFriendModalVisible] = useState(false);
+  const [friendRequests, setFriendRequests] = useState([]);
+  // Seçilen kutu için arkadaşlık isteği gönderme durumu
+  const [requestSent, setRequestSent] = useState(false);
+  
+  // Gelen istekleri modal açılınca yükle
+  useEffect(() => {
+    if (addFriendModalVisible) {
+      (async () => {
+        try {
+          const requests = await getFriendRequests();
+          setFriendRequests(requests);
+        } catch (error) {
+          console.error('İstekler alınamadı:', error);
+        }
+      })();
+    }
+  }, [addFriendModalVisible]);
+  
+  const acceptRequest = async (id) => {
+    try {
+      await acceptFriendRequest(id);
+      setFriendRequests(prev => prev.filter(r => r.id !== id));
+    } catch (error) {
+      console.error('İstek kabul hatası:', error);
+    }
+  };
+  const rejectRequest = async (id) => {
+    try {
+      await rejectFriendRequest(id);
+      setFriendRequests(prev => prev.filter(r => r.id !== id));
+    } catch (error) {
+      console.error('İstek reddetme hatası:', error);
+    }
+  };
+  const [friendQuery, setFriendQuery] = useState('');
+  const handleFriendAdd = () => {
+    if (!friendQuery.trim()) {
+      Alert.alert('Hata', 'Lütfen bir kullanıcı adı veya e-posta girin.');
+      return;
+    }
+    Alert.alert('İstek Gönderildi', `${friendQuery} için arkadaşlık isteği gönderildi.`);
+    setFriendQuery('');
+    setAddFriendModalVisible(false);
+  };
   const [isSwapped, setIsSwapped] = useState(false);
-  const { user } = useContext(AuthContext);
 
   // Prefetch images so swapping is instant
   useEffect(() => {
@@ -72,6 +115,19 @@ const HomeScreen = ({ navigation }) => {
   }, [selectedBox]);
 
   const handleBoxPhotoOpen = (box) => { setSelectedBox(box); setIsSwapped(false); };
+  
+  /**
+   * Seçilen kutu sahibine arkadaşlık isteği gönderir.
+   */
+  const handleSendRequest = async () => {
+    try {
+      await sendFriendRequest(selectedBox.userId);
+      Alert.alert('İstek Gönderildi', `${selectedBox.username} için arkadaşlık isteği gönderildi.`);
+      setRequestSent(true);
+    } catch (error) {
+      Alert.alert('Hata', error.message || 'İstek gönderilemedi.');
+    }
+  };
   // BoxesContext güncellemelerini konsola yazdır
   useEffect(() => {
     console.log('HomeScreen boxes güncellendi:', boxes);
@@ -221,15 +277,6 @@ const HomeScreen = ({ navigation }) => {
   const handleChatPress = () => {
     animateButton('chat');
     navigation.navigate('Chat');
-  };
-
-  const handleAddFriend = async () => {
-    try {
-      await sendFriendRequest(selectedBox.userId);
-      Alert.alert('Başarılı', 'Arkadaşlık isteği gönderildi');
-    } catch (error) {
-      Alert.alert('Hata', error.message);
-    }
   };
 
   const insets = useSafeAreaInsets();
@@ -464,15 +511,15 @@ const HomeScreen = ({ navigation }) => {
             {/* Orta - Boş alan (Logo bottom'a taşındı) */}
             <View style={{ flex: 1 }} />
             
-            {/* Sağ üst - Arkadaşlık isteği butonu */}
+            {/* Sağ üst - Arkadaşlık isteği butonu (modal veya ekran açılacak) */}
             <TouchableOpacity 
               style={[homeScreenStyles.modernButton, homeScreenStyles.friendRequestButton]}
-              onPress={clearBoxes}
+              onPress={() => setAddFriendModalVisible(true)}
               activeOpacity={0.7}
             >
               <Ionicons name="person-add" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
-            {/* Geliştirme: Tüm kutuları temizle butonu */}
+            {/* Tüm kutuları temizle butonu */}
             <TouchableOpacity
               onPress={clearBoxes}
               style={[homeScreenStyles.modernButton, homeScreenStyles.friendRequestButton]}
@@ -562,21 +609,49 @@ const HomeScreen = ({ navigation }) => {
                   />
                 </TouchableOpacity>
               </View>
-              {selectedBox.userId !== user.id && (
-                <TouchableOpacity
-                  style={{
-                    marginTop: 12,
-                    backgroundColor: colors.primary,
-                    paddingVertical: 10,
-                    borderRadius: 8,
-                    alignItems: 'center',
-                  }}
-                  onPress={handleAddFriend}
-                  activeOpacity={0.7}
-                >
-                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Arkadaş Ekle</Text>
-                </TouchableOpacity>
-              )}
+              {/* Arkadaş ekle butonu */}
+              <TouchableOpacity
+                style={[homeScreenStyles.modernButton, homeScreenStyles.friendRequestButton, { alignSelf: 'center', marginTop: 16 }]}
+                onPress={handleSendRequest}
+                disabled={requestSent}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={requestSent ? 'checkmark' : 'person-add'}
+                  size={24}
+                  color={requestSent ? colors.accent : colors.textPrimary}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+      {addFriendModalVisible && (
+        <Modal visible transparent animationType="slide" onRequestClose={() => setAddFriendModalVisible(false)}>
+          <View style={styles.friendModalOverlay}>
+            <View style={styles.friendModalContent}>
+              <TouchableOpacity style={styles.modalClose} onPress={() => setAddFriendModalVisible(false)}>
+                <Ionicons name="close" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.friendModalTitle}>Arkadaş İstekleri</Text>
+              <FlatList
+                data={friendRequests}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => (
+                  <View style={styles.requestItem}>
+                    <Text style={styles.requestText}>{item.name}</Text>
+                    <View style={styles.requestButtons}>
+                      <TouchableOpacity onPress={() => acceptRequest(item.id)} style={styles.acceptButton}>
+                        <Text style={styles.acceptButtonText}>Kabul Et</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => rejectRequest(item.id)} style={styles.rejectButton}>
+                        <Text style={styles.rejectButtonText}>Reddet</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+                ListEmptyComponent={<Text style={styles.emptyText}>Bekleyen istek yok</Text>}
+              />
             </View>
           </View>
         </Modal>
@@ -612,5 +687,16 @@ const styles = StyleSheet.create({
   },
   calloutContent: { backgroundColor: '#FFF', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
   calloutText: { color: '#000', fontSize: 14 },
+  friendModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-start', alignItems: 'center' },
+  friendModalContent: { width: '90%', backgroundColor: '#0E0E0F', borderRadius: 16, padding: 16, marginTop: 60 },
+  friendModalTitle: { fontSize: 18, fontWeight: 'bold', color: 'white', marginBottom: 12 },
+  requestItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.outlineGrey },
+  requestText: { color: colors.textPrimary, fontSize: 16 },
+  requestButtons: { flexDirection: 'row' },
+  acceptButton: { backgroundColor: colors.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, marginRight: 8 },
+  acceptButtonText: { color: colors.textPrimary, fontWeight: '600' },
+  rejectButton: { backgroundColor: colors.error, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  rejectButtonText: { color: colors.textPrimary, fontWeight: '600' },
+  emptyText: { color: colors.textSecondary, textAlign: 'center', marginTop: 16 },
 });
 export default HomeScreen; 

@@ -8,6 +8,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ProfileEditScreen from '../screens/ProfileEditScreen';
 import MapScreen from '../screens/MapScreen';
 import ChatConversationScreen from '../screens/ChatConversationScreen';
+import NewChatScreen from '../screens/NewChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +66,16 @@ const MainStack = () => (
       name="ChatConversation"
       component={ChatConversationScreen}
       options={{ presentation: 'card' }}
+    />
+    {/* Yeni mesaj modal (Arkadaş listesi) */}
+    <Stack.Screen
+      name="NewChat"
+      component={NewChatScreen}
+      options={{
+        presentation: 'modal',
+        gestureDirection: 'vertical',
+        headerShown: false,
+      }}
     />
   </Stack.Navigator>
 );

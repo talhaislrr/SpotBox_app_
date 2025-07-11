@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Animated, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { ChatContext } from '../context/ChatContext';
 
 import { colors } from '../constants/colors';
 import { springConfigs, timingConfigs } from '../constants/animations';
@@ -12,37 +13,31 @@ const messageImageCopy2 = require('../../assets/image copy 2.png');
 const ChatConversationScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { user } = route.params || { user: { name: 'Kullanıcı' } };
-
-  // Mock mesaj verisi
-  const [messages, setMessages] = useState([
-    { id: '1', text: 'Merhaba!', isMe: false, time: '10:00' },
-    { id: '2', text: 'Selam, nasılsın?', isMe: true, time: '10:01' },
-    { id: '3', text: 'İyiyim, teşekkürler. Sen?', isMe: false, time: '10:02' },
-    { id: '4', text: 'Harikayım, müzik kutunu beğendim 🎵', isMe: true, time: '10:03' },
-  ]);
+  const { conversations, messages: allMessages, loadMessages, sendMessage } = useContext(ChatContext);
+  const { conversationId, user } = route.params;
   const [inputText, setInputText] = useState('');
 
   // Basit animasyonlar
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: timingConfigs.fadeIn.duration,
-      useNativeDriver: true,
-    }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: timingConfigs.fadeIn.duration, useNativeDriver: true }).start();
   }, []);
+  
+  // Mesajları yükle
+  useEffect(() => {
+    if (conversationId) {
+      loadMessages(conversationId);
+    }
+  }, [conversationId]);
 
-  const sendMessage = () => {
+  const handleSend = async () => {
     if (!inputText.trim()) return;
-    const newMessage = {
-      id: Date.now().toString(),
-      text: inputText.trim(),
-      isMe: true,
-      time: 'Şimdi',
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInputText('');
+    try {
+      await sendMessage(conversationId, inputText.trim());
+      setInputText('');
+    } catch (error) {
+      console.error('Mesaj gönderme hatası:', error);
+    }
   };
 
   const renderMessage = ({ item }) => (
@@ -78,6 +73,14 @@ const ChatConversationScreen = () => {
     </View>
   );
 
+  // Raw mesajları uygun formata çevir
+  const chatMessages = (allMessages[conversationId] || []).map(m => ({
+    id: m._id,
+    text: m.text,
+    isMe: m.senderId === user.id,
+    time: new Date(m.timestamp).toLocaleTimeString(),
+  }));
+  
   return (
     <SafeAreaView style={chatConversationStyles.container}>
       {/* Header */}
@@ -115,9 +118,9 @@ const ChatConversationScreen = () => {
       </View>
 
       {/* Messages */}
-      <Animated.View style={[{ flex: 1, opacity: fadeAnim }]}>
+      <Animated.View style={[{ flex: 1, opacity: fadeAnim }]}>  
         <FlatList
-          data={messages}
+          data={chatMessages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
           contentContainerStyle={chatConversationStyles.messagesContainer}
@@ -141,7 +144,7 @@ const ChatConversationScreen = () => {
           value={inputText}
           onChangeText={setInputText}
         />
-        <TouchableOpacity style={chatConversationStyles.sendButton} onPress={sendMessage}>
+        <TouchableOpacity style={chatConversationStyles.sendButton} onPress={handleSend}>
           <Ionicons name="paper-plane" size={22} color={colors.white} />
         </TouchableOpacity>
       </KeyboardAvoidingView>

@@ -1,4 +1,4 @@
-Style////import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { colors, colorCombinations } from '../constants/colors';
 
 export const chatScreenStyles = StyleSheet.create({
@@ -151,7 +151,7 @@ export const chatScreenStyles = StyleSheet.create({
   // Floating Action Button - Neon Gradient
   fab: {
     position: 'absolute',
-    bottom: 730, // Bottom navigation bar'ın üstüne taşıdık
+    bottom: 20, // Floating Action Button için uygun alt boşluk
     right: 20,
     width: 56,
     height: 56,
@@ -166,5 +166,42 @@ export const chatScreenStyles = StyleSheet.create({
     elevation: 8,
     borderWidth: 1,
     borderColor: colors.outlineGrey,
+  },
+  // Modal stilleri
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    maxHeight: '70%',
+    backgroundColor: colors.surfaceGrey,
+    borderRadius: 16,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: 12,
+  },
+  friendItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineGrey,
+  },
+  friendItemText: {
+    fontSize: 16,
+    color: colors.textPrimary,
+  },
+  closeButton: {
+    marginTop: 16,
+    alignSelf: 'flex-end',
   },
 });

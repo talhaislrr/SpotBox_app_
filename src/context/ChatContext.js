@@ -50,7 +50,8 @@ export const ChatProvider = ({ children }) => {
   const startConversation = async (participantId) => {
     try {
       const conv = await createConversation(participantId);
-      setConversations(prev => [conv, ...prev]);
+      // Konuşma oluşturulduktan sonra güncel konuşmaları tekrar yükle
+      await loadConversations();
       return conv;
     } catch (error) {
       console.error('Konuşma başlatılamadı:', error);

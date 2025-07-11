@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { SafeAreaView, Animated, Text, View, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { ChatContext } from '../context/ChatContext';
+import { AuthContext } from '../context/AuthContext';
 
 import { colors, colorCombinations } from '../constants/colors';
 import { springConfigs, timingConfigs, tabAnimationValues } from '../constants/animations';
@@ -17,37 +19,28 @@ const ChatScreen = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(tabAnimationValues.translate.left)).current;
   
-  // Mock data - sohbet listesi
-  const [chatList] = useState([
-    { 
-      id: 1, 
-      name: 'Ayşe', 
-      lastMessage: 'Box\'ını açtım, harika fotoğraf! 📸', 
-      time: '2dk önce',
-      isOnline: true, 
-      avatar: mimojiBlue,
-      unreadCount: 2 
-    },
-    { 
-      id: 2, 
-      name: 'Durul', 
-      lastMessage: 'Yakında yeni box bıraktım, kontrol et', 
-      time: '5dk önce',
-      isOnline: false, 
-      avatar: imageCopy,
-      unreadCount: 0 
-    },
-    { 
-      id: 3, 
-      name: 'Zeynep', 
-      lastMessage: 'Merhaba! Nasılsın?', 
-      time: '1s önce',
-      isOnline: true, 
-      avatar: mimojiDurul,
-      unreadCount: 1 
-    },
-  ]);
-  
+  const { user } = useContext(AuthContext);
+  const { conversations, messages, loadConversations } = useContext(ChatContext);
+
+  useEffect(() => {
+    loadConversations();
+  }, []);
+
+  const chatList = conversations.map(conv => {
+    const other = conv.participants.find(p => p._id !== user.id);
+    const lastMsgs = messages[conv._id] || [];
+    const last = lastMsgs[lastMsgs.length - 1];
+    return {
+      id: conv._id,
+      name: other.name,
+      avatar: other.avatar || mimojiBlue,
+      lastMessage: last ? last.text : 'Yeni sohbet',
+      time: last ? new Date(last.timestamp).toLocaleTimeString() : '',
+      isOnline: other.isOnline, // optional
+      unreadCount: 0, // implement unread later
+    };
+  });
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -146,7 +139,7 @@ const ChatScreen = () => {
         </View>
 
         {/* Floating Action Button */}
-        <TouchableOpacity style={chatScreenStyles.fab} activeOpacity={0.8}>
+        <TouchableOpacity style={chatScreenStyles.fab} activeOpacity={0.8} onPress={() => navigation.navigate('NewChat')}>
           <Ionicons name="add" size={28} color={colors.white} />
         </TouchableOpacity>
       </Animated.View>
