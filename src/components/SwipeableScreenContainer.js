@@ -12,7 +12,7 @@ import {
 
 import HomeScreen from '../screens/HomeScreen';
 import ChatScreen from '../screens/ChatScreen';
-import LibraryScreen from '../screens/LibraryScreen';
+import FeedScreen from '../screens/FeedScreen';
 import { colors } from '../constants/colors';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -47,7 +47,7 @@ const SwipeableScreenContainer = ({ navigation, route }) => {
   
   // Ekranlarımızın verileri - Library ve Chat'in yeri değişti
   const screens = [
-    { key: 'Library', component: <LibraryScreen />, index: 0 },
+    { key: 'Library', component: <FeedScreen navigation={navigation} />, index: 0 },
     { key: 'Home', component: <HomeScreen navigation={navigation} />, index: 1 },
     { key: 'Chat', component: <ChatScreen />, index: 2 },
   ];

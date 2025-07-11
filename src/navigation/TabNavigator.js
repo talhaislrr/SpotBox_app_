@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import CustomBottomBar from '../components/CustomBottomBar';
 import SwipeableScreenContainer from '../components/SwipeableScreenContainer';
-import LibraryScreen from '../screens/LibraryScreen';
+import FeedScreen from '../screens/FeedScreen';
 import ChatScreen from '../screens/ChatScreen';
 
 const Tab = createBottomTabNavigator();
@@ -21,8 +21,8 @@ export const TabNavigator = () => (
   >
     <Tab.Screen
       name="Library"
-      component={LibraryScreen}
-      options={{ tabBarLabel: 'Library' }}
+      component={FeedScreen}
+      options={{ tabBarLabel: 'Gönderiler' }}
     />
     <Tab.Screen
       name="Home"

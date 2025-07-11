@@ -3,20 +3,24 @@ import { View, TouchableOpacity, StyleSheet, Image, Text } from 'react-native';
 import { colors, colorCombinations } from '../constants/colors';
 
 const CustomBottomBar = ({ state, descriptors, navigation }) => {
-  const homeRoute = navigation.getState().routes.find(r => r.name === 'Home');
-  const currentScreen = homeRoute?.params?.currentScreen || 'Home';
+  // Odaklı tab indexi
+  const focusedIndex = state.index;
 
   return (
     <View style={styles.container}>
-      {state.routes.map((route) => {
-        const isFocused = route.name === currentScreen;
+      {state.routes.map((route, index) => {
+        const isFocused = focusedIndex === index;
         
         // Buton basıldığında doğru ekrana yönlendir
         const onPress = () => {
-          // Hangi butona basıldıysa o ekrana git
-          navigation.setParams({ navigateTo: route.name });
+          // Önce tab navigasyonunda Home sekmesine geç
+          if (route.name === 'Home') {
+            navigation.navigate('Home', { navigateTo: 'Home' });
+          } else {
+            navigation.navigate(route.name);
+          }
         };
-        
+
         let iconSource;
         let label;
         switch (route.name) {
@@ -38,24 +42,13 @@ const CustomBottomBar = ({ state, descriptors, navigation }) => {
         }
 
         return (
-          <TouchableOpacity
-            key={route.key}
-            onPress={onPress}
-            style={styles.button}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity key={route.key} onPress={onPress} style={styles.button} activeOpacity={0.7}>
             <Image
               source={iconSource}
-              style={[
-                styles.icon,
-                !isFocused && { opacity: 0.4 }
-              ]}
+              style={[styles.icon, !isFocused && { opacity: 0.4 }]}
               resizeMode="contain"
             />
-            <Text style={[
-              styles.label, 
-              { color: isFocused ? colors.textPrimary : colors.textSecondary }
-            ]}>
+            <Text style={[styles.label, { color: isFocused ? colors.textPrimary : colors.textSecondary }]}>
               {label}
             </Text>
           </TouchableOpacity>

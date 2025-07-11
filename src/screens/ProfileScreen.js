@@ -1,131 +1,103 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView, ScrollView, View, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../constants/colors';
+import { Appbar, Avatar, Card, Button, Divider, Text } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import { getProfile } from '../services/apiAuth';
+import { colors } from '../constants/colors';
+import { API_URL } from '../services/config';
 
 const ProfileScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { user, logout } = useContext(AuthContext);
-  const [profileData, setProfileData] = useState(null);
+  const { logout } = useContext(AuthContext);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    const loadProfile = async () => {
+    (async () => {
       try {
         const data = await getProfile();
-        setProfileData(data);
-      } catch (error) {
-        console.error('Profil verisi alınamadı:', error);
-        Alert.alert('Hata', error.message);
+        setProfile(data);
+      } catch (err) {
+        console.error(err);
       }
-    };
-    if (user) loadProfile();
-  }, [user]);
+    })();
+  }, []);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>  
-      <View style={styles.header}>  
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
-          <Ionicons name="close" size={24} color={colors.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profil</Text>
-        <View style={{ width: 48 }} />
-      </View>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.avatarContainer}>
-          <Image source={require('../../assets/profile_avatar.png')} style={styles.avatar} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.backBlack, paddingTop: insets.top }}>
+      <Appbar.Header style={{ backgroundColor: colors.surfaceGrey }}>
+        <Appbar.BackAction color={colors.primary} onPress={() => navigation.goBack()} />
+        <Appbar.Content
+          title={profile?.username || ''}
+          subtitle={profile?.email || ''}
+          titleStyle={{ color: colors.textPrimary }}
+          subtitleStyle={{ color: colors.textSecondary }}
+        />
+        <Appbar.Action icon='logout' color={colors.primary} onPress={logout} />
+      </Appbar.Header>
+
+      <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <View style={{ alignItems: 'center', marginBottom: 24 }}>
+          <Avatar.Image size={100} source={require('../../assets/profile_avatar.png')} />
+          <Text variant='headlineMedium' style={{ marginTop: 12, color: colors.textPrimary }}>
+            {profile?.username}
+          </Text>
+          <Text variant='bodyMedium' style={{ color: colors.textSecondary }}>
+            {profile?.email}
+          </Text>
         </View>
-        <Text style={styles.name}>{profileData?.username || user?.email || 'Kullanıcı Adı'}</Text>
-        <Text style={styles.email}>{profileData?.email || user?.email || ''}</Text>
-        <View style={styles.optionList}>
-          <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('ProfileEdit')}>
-            <Text style={styles.optionText}>Profil Düzenle</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.optionItem}>
-            <Text style={styles.optionText}>Ayarlar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.optionItem} onPress={logout}>
-            <Text style={[styles.optionText, { color: colors.error }]}>Çıkış Yap</Text>
-          </TouchableOpacity>
+
+        <Divider style={{ marginVertical: 16, backgroundColor: colors.outlineGrey }} />
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap' }}>
+          <View style={{ alignItems: 'center', flex: 1 }}>
+            <Text variant='labelLarge' style={{ color: colors.textSecondary }}>Fotoğraflar</Text>
+            <Text variant='headlineSmall' style={{ color: colors.textPrimary }}>
+              {profile?.photos?.length || 0}
+            </Text>
+          </View>
+          <View style={{ alignItems: 'center', flex: 1 }}>
+            <Text variant='labelLarge' style={{ color: colors.textSecondary }}>Takipçi</Text>
+            <Text variant='headlineSmall' style={{ color: colors.textPrimary }}>
+              {profile?.followers?.length || 0}
+            </Text>
+          </View>
+          <View style={{ alignItems: 'center', flex: 1 }}>
+            <Text variant='labelLarge' style={{ color: colors.textSecondary }}>Takip</Text>
+            <Text variant='headlineSmall' style={{ color: colors.textPrimary }}>
+              {profile?.following?.length || 0}
+            </Text>
+          </View>
+          <View style={{ alignItems: 'center', flex: 1 }}>
+            <Text variant='labelLarge' style={{ color: colors.textSecondary }}>Arkadaşlar</Text>
+            <Text variant='headlineSmall' style={{ color: colors.textPrimary }}>
+              {profile?.friends?.length || 0}
+            </Text>
+          </View>
         </View>
+
+        <Divider style={{ marginVertical: 16, backgroundColor: colors.outlineGrey }} />
+
+        <Text variant='titleMedium' style={{ marginBottom: 12, color: colors.textPrimary }}>
+          Galeri
+        </Text>
+
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          {profile?.photos?.map((filename, index) => (
+            <TouchableOpacity key={index} style={{ width: '48%', aspectRatio: 1, marginBottom: 8 }}>
+              <Card style={{ flex: 1, backgroundColor: colors.surfaceGrey }}>
+                <Card.Cover source={{ uri: `${API_URL}/uploads/${filename}` }} />
+              </Card>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Button mode='contained' buttonColor={colors.primary} textColor={colors.backBlack} style={{ marginTop: 24 }} onPress={logout}>
+          Çıkış Yap
+        </Button>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
-export default ProfileScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.backBlack,
-  },
-  header: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    backgroundColor: colors.surfaceGrey,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineGrey,
-  },
-  closeButton: {
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  contentContainer: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  avatarContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    overflow: 'hidden',
-    marginBottom: 16,
-    backgroundColor: colors.surfaceGrey,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  avatar: {
-    width: '100%',
-    height: '100%',
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 24,
-  },
-  optionList: {
-    width: '100%',
-  },
-  optionItem: {
-    paddingVertical: 12,
-    marginVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionText: {
-    fontSize: 16,
-    color: colors.textPrimary,
-  },
-}); 
+export default ProfileScreen; 

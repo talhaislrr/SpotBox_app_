@@ -5,7 +5,11 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  photos: { type: [String], default: [] },
+  followers: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] },
+  following: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] },
+  friends: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] },
 });
 
 // Şifre kaydetmeden önce hashle
