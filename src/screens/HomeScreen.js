@@ -11,6 +11,8 @@ import { defaultRegions } from '../constants/mapStyles';
 import { springConfigs, timingConfigs } from '../constants/animations';
 import { homeScreenStyles } from '../styles/homeScreenStyles';
 import { BoxesContext } from '../context/BoxesContext';
+import { AuthContext } from '../context/AuthContext';
+import { sendFriendRequest } from '../services/apiFriends';
 
 const generateHtml = (lat, lng, styleJson) => `<!DOCTYPE html>
 <html>
@@ -59,6 +61,7 @@ const HomeScreen = ({ navigation }) => {
   const { boxes, clearBoxes } = useContext(BoxesContext);
   const [selectedBox, setSelectedBox] = useState(null);
   const [isSwapped, setIsSwapped] = useState(false);
+  const { user } = useContext(AuthContext);
 
   // Prefetch images so swapping is instant
   useEffect(() => {
@@ -218,6 +221,15 @@ const HomeScreen = ({ navigation }) => {
   const handleChatPress = () => {
     animateButton('chat');
     navigation.navigate('Chat');
+  };
+
+  const handleAddFriend = async () => {
+    try {
+      await sendFriendRequest(selectedBox.userId);
+      Alert.alert('Başarılı', 'Arkadaşlık isteği gönderildi');
+    } catch (error) {
+      Alert.alert('Hata', error.message);
+    }
   };
 
   const insets = useSafeAreaInsets();
@@ -550,6 +562,21 @@ const HomeScreen = ({ navigation }) => {
                   />
                 </TouchableOpacity>
               </View>
+              {selectedBox.userId !== user.id && (
+                <TouchableOpacity
+                  style={{
+                    marginTop: 12,
+                    backgroundColor: colors.primary,
+                    paddingVertical: 10,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                  }}
+                  onPress={handleAddFriend}
+                  activeOpacity={0.7}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>Arkadaş Ekle</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </Modal>
