@@ -5,22 +5,33 @@ import { API_URL } from './config';
 // API_URL merkezi config dosyasından geliyor
 
 /**
- * Registers a new user via backend API and stores token/user in AsyncStorage.
+ * Yeni kullanıcı kaydı yapar.
+ * @param {string} name - Kullanıcının tam adı.
+ * @param {string} email - Kullanıcının e-posta adresi.
+ * @param {string} username - Kullanıcının adı.
+ * @param {string} password - Kullanıcının şifresi.
  */
-export const register = async (email, password, username) => {
-  const response = await fetch(`${API_URL}/api/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, username }),
-  });
-  if (!response.ok) {
-    const err = await response.json().catch(() => {});
-    throw new Error(err.message || 'Register failed');
+export const register = async (name, email, username, password) => {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, username, password }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => {});
+      throw new Error(err.message || 'Register failed');
+    }
+    const { token, user } = await response.json();
+    await AsyncStorage.setItem('token', token);
+    await AsyncStorage.setItem('user', JSON.stringify(user));
+    return user;
+  } catch (error) {
+    console.error('Register error:', error);
+    throw error;
   }
-  const { token, user } = await response.json();
-  await AsyncStorage.setItem('token', token);
-  await AsyncStorage.setItem('user', JSON.stringify(user));
-  return user;
 };
 
 /**

@@ -5,6 +5,7 @@ import CustomBottomBar from '../components/CustomBottomBar';
 import SwipeableScreenContainer from '../components/SwipeableScreenContainer';
 import FeedScreen from '../screens/FeedScreen';
 import ChatScreen from '../screens/ChatScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +34,11 @@ export const TabNavigator = () => (
       name="Chat"
       component={ChatScreen}
       options={{ tabBarLabel: 'Social' }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={{ tabBarLabel: 'Profil' }}
     />
   </Tab.Navigator>
 );

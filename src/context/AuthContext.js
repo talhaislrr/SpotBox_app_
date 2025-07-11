@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login, register, logout as apiLogout } from '../services/apiAuth';
+import { login, register, logout as apiLogout, getProfile } from '../services/apiAuth';
 
 export const AuthContext = createContext({
   user: null,
@@ -8,35 +8,40 @@ export const AuthContext = createContext({
   signIn: async () => {},
   signUp: async () => {},
   logout: async () => {},
+  updateUserProfile: async () => {},
 });
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount, load user from AsyncStorage
+  // On mount, fetch profile from backend if token exists
   useEffect(() => {
-    const loadUser = async () => {
+    const initAuth = async () => {
       try {
-        const userJson = await AsyncStorage.getItem('user');
-        const u = userJson ? JSON.parse(userJson) : null;
-        setUser(u);
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          const u = await getProfile();
+          setUser(u);
+        }
       } catch (err) {
-        console.error('AsyncStorage error:', err);
+        console.error('Auth init error:', err);
         setUser(null);
       }
       setLoading(false);
     };
-    loadUser();
+    initAuth();
   }, []);
 
   const signIn = async (email, password) => {
-    const u = await login(email, password);
+    await login(email, password);
+    const u = await getProfile();
     setUser(u);
     return u;
   };
-  const signUp = async (email, password, username) => {
-    const u = await register(email, password, username);
+  const signUp = async (name, email, password, username) => {
+    await register(name, email, username, password);
+    const u = await getProfile();
     setUser(u);
     return u;
   };
@@ -45,8 +50,14 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUserProfile = (updatedData) => {
+    const newUser = { ...user, ...updatedData };
+    setUser(newUser);
+    AsyncStorage.setItem('user', JSON.stringify(newUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, logout }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, logout, updateUserProfile }}>
       {children}
     </AuthContext.Provider>
   );

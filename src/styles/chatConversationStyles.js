@@ -143,4 +143,4 @@ export const chatConversationStyles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 8,
   },
-}); 
+});

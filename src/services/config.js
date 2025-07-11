@@ -1,5 +1,6 @@
 // src/services/config.js
-// Uygulamanın backend API adresini bu dosyadan ayarlayın.
-// Eğer serveri herkese açık bir URL ile yayınladıysanız buraya o adresi girin.
+// Bu dosya, uygulama genelinde kullanılacak olan yapılandırma ayarlarını içerir.
+// API_URL gibi merkezi değişkenler burada tanımlanır.
 // Örneğin: export const API_URL = 'https://abcd1234.ngrok.io';
-export const API_URL = 'https://wise-cities-double.loca.lt'; 
+// API_URL merkezde backend adresi, localtunnel kullanımı için güncellendi
+export const API_URL = 'https://gold-paws-film.loca.lt'; 

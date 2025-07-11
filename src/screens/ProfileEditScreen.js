@@ -1,20 +1,37 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
+import { AuthContext } from '../context/AuthContext';
+import { updateMyProfile } from '../services/apiUsers';
 
 const ProfileEditScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  // Mevcut kullanıcı bilgilerinin başlangıç değerleri
-  const [name, setName] = useState('Kullanıcı Adı');
-  const [email, setEmail] = useState('user@example.com');
-  // Kullanıcı adı (username) alanı
-  const [username, setUsername] = useState('kullaniciadi');
+  const { user, updateUserProfile } = useContext(AuthContext);
 
-  const handleSave = () => {
-    // TODO: profil güncelleme işlemi
-    navigation.goBack();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setUsername(user.username || '');
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    try {
+      const updatedData = { name, email, username };
+      const updatedUser = await updateMyProfile(updatedData);
+      updateUserProfile(updatedUser); // Context'i ve AsyncStorage'ı güncelle
+      Alert.alert('Başarılı', 'Profiliniz güncellendi.');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Hata', error.message);
+    }
   };
 
   return (
