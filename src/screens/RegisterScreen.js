@@ -8,8 +8,13 @@ const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
 
   const handleRegister = async () => {
+    if (!name.trim()) {
+      Alert.alert('Kayıt Hatası', 'Ad alanı boş olamaz');
+      return;
+    }
     // Zorunlu alan doğrulama
     if (!username.trim()) {
       Alert.alert('Kayıt Hatası', 'Kullanıcı adı alanı boş olamaz');
@@ -23,9 +28,9 @@ const RegisterScreen = ({ navigation }) => {
       Alert.alert('Kayıt Hatası', 'Şifre alanı boş olamaz');
       return;
     }
-    console.log('Kayıt bilgileri:', { email, username, password });
+    console.log('Kayıt bilgileri:', { name, email, username, password });
     try {
-      const user = await signUp(email, password, username);
+      const user = await signUp(name, email, password, username);
       // Kayıt başarılı, geri dön
       navigation.goBack();
     } catch (error) {
@@ -36,6 +41,13 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Kayıt Ol</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Adınız"
+        placeholderTextColor="#B5B7BB"
+        value={name}
+        onChangeText={setName}
+      />
       <TextInput
         style={styles.input}
         placeholder="Kullanıcı Adı"

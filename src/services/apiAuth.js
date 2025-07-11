@@ -21,8 +21,14 @@ export const register = async (name, email, username, password) => {
       body: JSON.stringify({ name, email, username, password }),
     });
     if (!response.ok) {
-      const err = await response.json().catch(() => {});
-      throw new Error(err.message || 'Register failed');
+      let errorMessage = 'Register failed';
+      try {
+        const errorData = await response.json();
+        if (errorData && errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (_) {}
+      throw new Error(errorMessage);
     }
     const { token, user } = await response.json();
     await AsyncStorage.setItem('token', token);
