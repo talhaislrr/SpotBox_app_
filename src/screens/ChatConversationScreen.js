@@ -3,6 +3,7 @@ import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, Keyboa
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ChatContext } from '../context/ChatContext';
+import { AuthContext } from '../context/AuthContext';
 
 import { colors } from '../constants/colors';
 import { springConfigs, timingConfigs } from '../constants/animations';
@@ -13,8 +14,13 @@ const messageImageCopy2 = require('../../assets/image copy 2.png');
 const ChatConversationScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  // Authenticated user
+  const authContext = useContext(AuthContext);
+  const authUser = authContext?.user;
+  // Chat context
   const { conversations, messages: allMessages, loadMessages, sendMessage } = useContext(ChatContext);
-  const { conversationId, user } = route.params;
+  // Route params (safe destructuring)
+  const { conversationId, user: otherUser } = route.params ?? {};
   const [inputText, setInputText] = useState('');
 
   // Basit animasyonlar
@@ -47,16 +53,10 @@ const ChatConversationScreen = () => {
       !item.isMe && { flexDirection: 'column', alignItems: 'flex-start' }
     ]}>
       {!item.isMe && (
-        <View style={[
-          chatConversationStyles.messageAvatarContainer,
-          user.name === 'Durul' && { backgroundColor: 'transparent' }
-        ]}>
-          <Image 
-            source={user.name === 'Durul' ? messageImageCopy2 : user.avatar} 
-            style={[
-              chatConversationStyles.messageAvatar,
-              user.name === 'Durul' && { backgroundColor: 'transparent' }
-            ]}
+        <View style={chatConversationStyles.messageAvatarContainer}>
+          <Image
+            source={otherUser.avatar || messageImageCopy2}
+            style={chatConversationStyles.messageAvatar}
             resizeMode="cover"
           />
         </View>
@@ -77,7 +77,7 @@ const ChatConversationScreen = () => {
   const chatMessages = (allMessages[conversationId] || []).map(m => ({
     id: m._id,
     text: m.text,
-    isMe: m.senderId === user.id,
+    isMe: m.senderId.toString() === authUser?._id?.toString(),
     time: new Date(m.timestamp).toLocaleTimeString(),
   }));
   
@@ -91,22 +91,19 @@ const ChatConversationScreen = () => {
         
         <View style={[
           chatConversationStyles.avatarContainer,
-          user.name === 'Durul' && { backgroundColor: 'transparent' }
+          otherUser?.name === 'Durul' && { backgroundColor: 'transparent' }
         ]}>
-          <Image 
-            source={user.name === 'Durul' ? headerImageCopy : user.avatar} 
-            style={[
-              chatConversationStyles.headerAvatar,
-              user.name === 'Durul' && { backgroundColor: 'transparent' }
-            ]}
+          <Image
+            source={otherUser.avatar || headerImageCopy}
+            style={chatConversationStyles.headerAvatar}
             resizeMode="cover"
           />
         </View>
         
         <View style={chatConversationStyles.userInfoContainer}>
-          <Text style={chatConversationStyles.headerTitle}>{user.name}</Text>
+          <Text style={chatConversationStyles.headerTitle}>{otherUser.name}</Text>
           <Text style={chatConversationStyles.lastSeenText}>
-            {user.isOnline ? 'Çevrimiçi' : 'Son görülme: 5dk önce'}
+            {otherUser.isOnline ? 'Çevrimiçi' : 'Son görülme: 5dk önce'}
           </Text>
         </View>
         

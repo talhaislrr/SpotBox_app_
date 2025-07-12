@@ -87,6 +87,7 @@ export const chatConversationStyles = StyleSheet.create({
   },
   myBubble: {
     alignSelf: 'flex-end',
+    marginLeft: 'auto',
     backgroundColor: colors.primary,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },

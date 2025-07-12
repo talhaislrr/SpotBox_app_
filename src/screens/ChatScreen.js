@@ -19,7 +19,7 @@ const ChatScreen = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(tabAnimationValues.translate.left)).current;
   
-  const { user } = useContext(AuthContext);
+  const { user: authUser } = useContext(AuthContext);
   const { conversations, messages, loadConversations } = useContext(ChatContext);
 
   useEffect(() => {
@@ -27,11 +27,12 @@ const ChatScreen = () => {
   }, []);
 
   const chatList = conversations.map(conv => {
-    const other = conv.participants.find(p => p._id !== user.id);
-    const lastMsgs = messages[conv._id] || [];
+    const convId = conv._id.toString();
+    const other = conv.participants.find(p => p._id.toString() !== authUser._id.toString());
+    const lastMsgs = messages[convId] || [];
     const last = lastMsgs[lastMsgs.length - 1];
     return {
-      id: conv._id,
+      id: convId,
       name: other.name,
       avatar: other.avatar || mimojiBlue,
       lastMessage: last ? last.text : 'Yeni sohbet',
@@ -61,7 +62,7 @@ const ChatScreen = () => {
     <TouchableOpacity
       style={chatScreenStyles.chatCard}
       activeOpacity={0.7}
-      onPress={() => navigation.navigate('ChatConversation', { user: item })}
+      onPress={() => navigation.navigate('ChatConversation', { conversationId: item.id, user: item })}
     >
       <View style={chatScreenStyles.chatInfo}>
         <View style={chatScreenStyles.avatarContainer}>
