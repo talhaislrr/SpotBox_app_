@@ -1,0 +1,62 @@
+{
+  "version": 8,
+  "name": "SpotBox Minimal",
+  "glyphs": "https://cdn.openmaptiles.org/fonts/{fontstack}/{range}.pbf",
+  "sprite": "https://tile.openfreemap.org/styles/liberty/sprite",
+  "sources": {
+    "openfreemap": {
+      "type": "vector",
+      "tiles": ["https://tile.openfreemap.org/planet/{z}/{x}/{y}.pbf"],
+      "maxzoom": 14
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": { "background-color": "#F9FCFF" }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "openfreemap",
+      "source-layer": "water",
+      "paint": { "fill-color": "#D6EFFF" }
+    },
+    {
+      "id": "landcover",
+      "type": "fill",
+      "source": "openfreemap",
+      "source-layer": "landcover",
+      "paint": { "fill-color": "#F8F9FA" }
+    },
+    {
+      "id": "city-labels",
+      "type": "symbol",
+      "source": "openfreemap",
+      "source-layer": "place",
+      "filter": ["==", "class", "city"],
+      "layout": {
+        "text-field": "{name}",
+        "text-font": ["Open Sans Semibold"],
+        "text-size": 14,
+        "text-anchor": "center"
+      },
+      "paint": { "text-color": "#1E88E5" }
+    },
+    {
+      "id": "town-labels",
+      "type": "symbol",
+      "source": "openfreemap",
+      "source-layer": "place",
+      "filter": ["==", "class", "town"],
+      "layout": {
+        "text-field": "{name}",
+        "text-font": ["Open Sans Regular"],
+        "text-size": 12,
+        "text-anchor": "center"
+      },
+      "paint": { "text-color": "#42A5F5" }
+    }
+  ]
+} 

@@ -1,0 +1,85 @@
+{
+  "expo": {
+    "name": "SpotBox",
+    "slug": "spotbox",
+    "version": "1.0.0",
+    "sdkVersion": "53.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SpotBox konum tabanlı müzik keşfi için konumunuzu kullanır."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyBXJcpzOL26QD1mucMjiyDFiaV1konkcyk"
+      },
+      "bundleIdentifier": "com.anonymous.spotbox"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBXJcpzOL26QD1mucMjiyDFiaV1konkcyk"
+        }
+      },
+      "package": "com.anonymous.spotbox"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "permissions": [
+      "LOCATION",
+      "CAMERA",
+      "CAMERA_ROLL"
+    ],
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Bu uygulama müzik keşfetmek için konum bilgisini kullanır.",
+          "locationWhenInUsePermission": "Bu uygulama müzik keşfetmek için konum bilgisini kullanır."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Bu uygulama müzik içerikleri için fotoğraf çekmek amacıyla kamera kullanır.",
+          "microphonePermission": "Bu uygulama müzik içerikleri için ses kaydetmek amacıyla mikrofon kullanır."
+        }
+      ]
+    ],
+    "eas": {
+      "projectId": "351953b3-1ad5-46f7-b825-976d836489b5"
+    },
+    "extra": {
+      "CLOUDINARY_CLOUD_NAME": "dcp1cc0zd",
+      "CLOUDINARY_UPLOAD_PRESET": "spotbox_unsigned"
+    }
+  }
+}
