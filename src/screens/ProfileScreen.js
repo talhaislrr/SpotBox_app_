@@ -4,10 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../constants/colors';
 import { AuthContext } from '../context/AuthContext';
+import { BoxesContext } from '../context/BoxesContext';
 
 const ProfileScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { user } = useContext(AuthContext);
+  const { boxes } = useContext(BoxesContext);
   const [isAvatarOptionsVisible, setAvatarOptionsVisible] = useState(false);
   // Glow animasyonu
   const glowAnim = useRef(new Animated.Value(0)).current;
@@ -37,8 +39,8 @@ const ProfileScreen = ({ navigation }) => {
     // require('../../assets/IMG_5176.png'), // HATA: Bu resim dosyası bulunamadı.
   ];
   // Kullanıcı istatistikleri (örnek sayılar, gerçek veri ile değiştirilmeli)
-  const friendsCount = 128;
-  const collagesCount = 24;
+  const friendsCount = user && user.friends ? user.friends.length : 0;
+  const collagesCount = 0;
   // Sekme durumu: 'posts' veya 'collages'
   const [activeTab, setActiveTab] = useState('posts');
   // Collage verileri (örnek, gerçek verilerle değiştirilmeli)
@@ -91,15 +93,15 @@ const ProfileScreen = ({ navigation }) => {
         {/* Kullanıcı istatistikleri */}
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statCount}>{user ? user.postsCount : 0}</Text>
+            <Text style={styles.statCount}>{user && user.avatar ? 1 : 0}</Text>
             <Text style={styles.statLabel}>Gönderi</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statCount}>{user ? user.friendsCount : 0}</Text>
+            <Text style={styles.statCount}>{friendsCount}</Text>
             <Text style={styles.statLabel}>Arkadaş</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statCount}>{user ? user.collagesCount : 0}</Text>
+            <Text style={styles.statCount}>{collagesCount}</Text>
             <Text style={styles.statLabel}>Kolaj</Text>
           </View>
         </View>

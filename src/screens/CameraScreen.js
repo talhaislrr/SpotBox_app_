@@ -145,20 +145,24 @@ const CameraScreen = ({ navigation }) => {
     // Multipart form-data ile server'a gönder
     try {
       const formData = new FormData();
-      formData.append('front', {
+      formData.append('photos', {
         uri: capturedPhotos[0].uri,
         name: 'front.jpg',
         type: 'image/jpeg',
       });
-      formData.append('back', {
+      formData.append('photos', {
         uri: capturedPhotos[1].uri,
         name: 'back.jpg',
         type: 'image/jpeg',
       });
       formData.append('latitude', location.coords.latitude.toString());
       formData.append('longitude', location.coords.longitude.toString());
+      
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/boxes-upload`, {
+      console.log('Token:', token ? 'Mevcut' : 'Yok');
+      console.log('API URL:', `${API_URL}/api/boxes/upload`);
+      
+      const response = await fetch(`${API_URL}/api/boxes/upload`, {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -166,9 +170,16 @@ const CameraScreen = ({ navigation }) => {
         },
         body: formData,
       });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
       if (!response.ok) {
-        throw new Error('Box upload error');
+        const errorText = await response.text();
+        console.log('Error response:', errorText);
+        throw new Error(`Box upload error: ${response.status} - ${errorText}`);
       }
+      
       const data = await response.json();
       console.log('Box upload success:', data);
     } catch (error) {

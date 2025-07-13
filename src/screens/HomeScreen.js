@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, StatusBar, Alert, Animated, TouchableOpacity, SafeAreaView, Modal, Text, TextInput, StyleSheet, Platform, Dimensions, Image, FlatList } from 'react-native';
+import { View, StatusBar, Alert, Animated, TouchableOpacity, SafeAreaView, Modal, Text, TextInput, StyleSheet, Platform, Dimensions, Image, FlatList, useWindowDimensions } from 'react-native';
 // CloudImage kullanımı kaldırıldı; native Image bileşeni ile URL’den gösteriliyor
 import { Ionicons } from '@expo/vector-icons';
 import MapView, { Marker, Circle, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import throttle from 'lodash.throttle';
 
 import { colors } from '../constants/colors';
 import { defaultRegions } from '../constants/mapStyles';
@@ -40,6 +41,7 @@ const HomeScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const mapRef = useRef(null);
+  const markerRefs = useRef({});
   
   // Ekran giriş animasyonları
   const mapFadeAnim = useRef(new Animated.Value(0)).current;
@@ -59,11 +61,15 @@ const HomeScreen = ({ navigation }) => {
 
   const { boxes, clearBoxes } = useContext(BoxesContext);
   const [selectedBox, setSelectedBox] = useState(null);
+  const [selectedBoxScreenPos, setSelectedBoxScreenPos] = useState(null);
+  const window = useWindowDimensions();
   const [addFriendModalVisible, setAddFriendModalVisible] = useState(false);
   const [friendRequests, setFriendRequests] = useState([]);
   // Seçilen kutu için arkadaşlık isteği gönderme durumu
   const [requestSent, setRequestSent] = useState(false);
-  
+  // openBoxId, openBoxScreenPos, showOpenButton state'lerini ve ilgili fonksiyonları kaldır
+  // Marker'ın altında buton gösteren render kodunu kaldır
+
   // Gelen istekleri modal açılınca yükle
   useEffect(() => {
     if (addFriendModalVisible) {
@@ -114,7 +120,25 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [selectedBox]);
 
-  const handleBoxPhotoOpen = (box) => { setSelectedBox(box); setIsSwapped(false); };
+  // Marker'a tıklanınca box'ı ve ekran pozisyonunu kaydet
+  const handleBoxPhotoOpen = async (box) => {
+    setSelectedBox(box);
+    setIsSwapped(false);
+    if (mapRef.current && box.location) {
+      try {
+        const point = await mapRef.current.pointForCoordinate(box.location);
+        setSelectedBoxScreenPos(point);
+      } catch (e) {
+        setSelectedBoxScreenPos(null);
+      }
+    }
+  };
+
+  // Harita hareket ederse veya başka bir yere tıklanırsa butonu gizle
+  const handleMapPress = () => {
+    setSelectedBox(null);
+    setSelectedBoxScreenPos(null);
+  };
   
   /**
    * Seçilen kutu sahibine arkadaşlık isteği gönderir.
@@ -267,16 +291,16 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Library');
   };
 
-  // Map butonu - Harita ekranına git
-  const handleMapPress = () => {
-    animateButton('map');
-    navigation.navigate('Map');
-  };
-
   // Chat butonu - Sohbet ekranına git
   const handleChatPress = () => {
     animateButton('chat');
     navigation.navigate('Chat');
+  };
+
+
+  // Butona tıklanınca fotoğraf modalı açılır
+  const handleOpenBoxButton = (box) => {
+    setSelectedBox(box);
   };
 
   const insets = useSafeAreaInsets();
@@ -316,6 +340,9 @@ const HomeScreen = ({ navigation }) => {
             region={currentRegion}
             customMapStyle={[]}
             userInterfaceStyle="dark"
+            onPress={handleMapPress}
+            onRegionChange={() => {}} // No longer needed
+            onRegionChangeComplete={() => {}} // No longer needed
           >
             {/* Kullanıcı konumu marker'ı - Neon Cyan */}
             {location && (
@@ -355,123 +382,28 @@ const HomeScreen = ({ navigation }) => {
             {boxes.map((box) => (
               <Marker
                 key={box._id}
+                ref={ref => (markerRefs.current[box._id] = ref)}
                 coordinate={box.location}
-                title="SpotBox"
-                description="Fotoğraf Kutusu"
                 zIndex={1}
-                onPress={() => handleBoxPhotoOpen(box)}
+                onPress={(e) => {
+                  // Olayın haritaya yayılmasını engelle
+                  e.stopPropagation();
+                  // Callout'u manuel olarak göster
+                  markerRefs.current[box._id]?.showCallout();
+                }}
               >
-                <View style={{
-                  width: 50,
-                  height: 50,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: 'transparent',
-                  shadowColor: colors.primary,
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.8,
-                  shadowRadius: 15,
-                  elevation: 10,
-                }}>
-                  <Image
-                    source={require('../../assets/box_closed.png')}
-                    style={{ width: 40, height: 40 }}
-                    resizeMode="contain"
-                  />
-                </View>
-                <Callout tooltip onPress={() => handleBoxPhotoOpen(box)}>
-                  <View style={styles.calloutContent}>
-                    <Text style={styles.calloutText}>Fotoğrafları Göster</Text>
+                <Image
+                  source={require('../../assets/box_closed.png')}
+                  style={{ width: 40, height: 40 }}
+                  resizeMode="contain"
+                />
+                <Callout tooltip onPress={() => setSelectedBox(box)}>
+                  <View style={styles.calloutView}>
+                    <Text style={styles.calloutText}>Kutuyu Aç</Text>
                   </View>
                 </Callout>
               </Marker>
             ))}
-
-            {/* Örnek müzik spot'ları - Secondary Magenta */}
-            <Marker
-              coordinate={{
-                latitude: currentRegion.latitude + 0.005,
-                longitude: currentRegion.longitude + 0.005,
-              }}
-              title="Müzik Spot"
-              description="Popüler müzik"
-            >
-              <View style={{
-                backgroundColor: colors.secondary,
-                borderRadius: 12,
-                width: 24,
-                height: 24,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 2,
-                borderColor: colors.textPrimary,
-              }}>
-                <View style={{
-                  backgroundColor: colors.textPrimary,
-                  borderRadius: 6,
-                  width: 8,
-                  height: 8,
-                }} />
-              </View>
-            </Marker>
-
-            <Marker
-              coordinate={{
-                latitude: currentRegion.latitude - 0.008,
-                longitude: currentRegion.longitude + 0.004,
-              }}
-              title="Müzik Spot"
-              description="Rock müzik"
-            >
-              <View style={{
-                backgroundColor: colors.accent,
-                borderRadius: 12,
-                width: 24,
-                height: 24,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 2,
-                borderColor: colors.textPrimary,
-              }}>
-                <View style={{
-                  backgroundColor: colors.textPrimary,
-                  borderRadius: 6,
-                  width: 8,
-                  height: 8,
-                }} />
-              </View>
-            </Marker>
-
-            <Marker
-              coordinate={{
-                latitude: currentRegion.latitude + 0.004,
-                longitude: currentRegion.longitude - 0.006,
-              }}
-              title="Müzik Spot"
-              description="Jazz müzik"
-            >
-              <View style={{
-                backgroundColor: '#8FA2B0',
-                borderRadius: 12,
-                width: 24,
-                height: 24,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 1.5,
-                borderColor: 'white',
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.15,
-                shadowRadius: 1.5,
-              }}>
-                <View style={{
-                  backgroundColor: 'white',
-                  borderRadius: 4,
-                  width: 8,
-                  height: 8,
-                }} />
-              </View>
-            </Marker>
           </MapView>
         </View>
         {/* Apple harita logosunu kapatmak için küçük Durul Mimoji */}
@@ -685,8 +617,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#FFF',
   },
-  calloutContent: { backgroundColor: '#FFF', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
-  calloutText: { color: '#000', fontSize: 14 },
+  calloutView: {
+    backgroundColor: colors.surfaceGrey,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    minWidth: 100,
+    alignItems: 'center',
+    borderRadius: 8,
+    borderColor: colors.outlineGrey,
+    borderWidth: 1,
+  },
+  calloutText: {
+    color: colors.textPrimary,
+    fontWeight: '600',
+    fontSize: 16,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
   friendModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-start', alignItems: 'center' },
   friendModalContent: { width: '90%', backgroundColor: '#0E0E0F', borderRadius: 16, padding: 16, marginTop: 60 },
   friendModalTitle: { fontSize: 18, fontWeight: 'bold', color: 'white', marginBottom: 12 },
