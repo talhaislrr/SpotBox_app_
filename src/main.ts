@@ -4,8 +4,23 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+  
+  // CORS ayarları
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
+  // Global validation pipe
+  app.useGlobalPipes(new ValidationPipe());
+
+  // API prefix
   app.setGlobalPrefix('api');
-  await app.listen(process.env.PORT ?? 5001);
+
+  // Port ayarı - Render için
+  const port = process.env.PORT || 5001;
+  
+  await app.listen(port);
+  console.log(`🚀 SpotBox Backend running on port ${port}`);
 }
 bootstrap();
