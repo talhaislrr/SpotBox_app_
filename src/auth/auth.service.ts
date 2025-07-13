@@ -19,7 +19,19 @@ export class AuthService {
       throw new BadRequestException('Bu e-posta zaten kayıtlı.');
     }
     const user = new this.userModel({ name, email, username, password });
-    await user.save();
+    try {
+      await user.save();
+    } catch (error) {
+      if (error.code === 11000) {
+        if (error.keyValue && error.keyValue.username) {
+          throw new BadRequestException('Bu kullanıcı adı zaten kullanılmış.');
+        }
+        if (error.keyValue && error.keyValue.email) {
+          throw new BadRequestException('Bu e-posta zaten kayıtlı.');
+        }
+      }
+      throw error;
+    }
     const token = this.jwtService.sign({ id: user._id, email: user.email });
     return { token, user: { id: user._id, name: user.name, email: user.email, username: user.username } };
   }

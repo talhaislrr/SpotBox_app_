@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ChatModule } from './chat/chat.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ChatModule } from './chat/chat.module';
     UsersModule,
     AuthModule,
     ChatModule,
+    FriendsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

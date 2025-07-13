@@ -21,7 +21,10 @@ export class ChatService {
   }
 
   async findConversations(userId: string) {
-    return this.convModel.find({ participants: userId }).exec();
+    return this.convModel
+      .find({ participants: userId })
+      .populate('participants', 'name username avatar')
+      .exec();
   }
 
   async findMessages(conversationId: string) {

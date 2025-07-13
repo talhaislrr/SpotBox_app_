@@ -15,4 +15,15 @@ export class UsersService {
     }
     return updatedUser;
   }
+
+  /**
+   * Belirtilen kullanıcının arkadaş listesini döner.
+   */
+  async getFriends(userId: string): Promise<UserDocument[]> {
+    const user = await this.userModel.findById(userId).populate('friends', 'name username');
+    if (!user) {
+      throw new NotFoundException('Kullanıcı bulunamadı.');
+    }
+    return (user.friends as unknown) as UserDocument[];
+  }
 }
